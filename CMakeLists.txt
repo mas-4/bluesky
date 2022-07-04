@@ -3,4 +3,4 @@ project(skyblue)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(skyblue main.cpp src/Config.cpp src/Config.h)
+add_executable(skyblue main.cpp src/Config.cpp src/Config.h src/Renderer.cpp src/Renderer.h)

@@ -6,6 +6,9 @@
 #include <unistd.h>
 #include <cstring>
 
+// create a null instance of Config to be initialized by main
+Config *config = nullptr;
+
 Config::Config(int argc, char *const argv[])
 {
     int ch;
