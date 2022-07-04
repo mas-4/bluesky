@@ -5,6 +5,8 @@
 #include "Config.h"
 #include <unistd.h>
 #include <cstring>
+#include <sys/stat.h>
+#include <iostream>
 
 // create a null instance of Config to be initialized by main
 Config *config = nullptr;
@@ -35,7 +37,17 @@ Config::Config(int argc, char *const argv[])
                 break;
         }
     }
-
+    // check if input directory is valid
+    if (m_input_dir.empty()) {
+        std::cerr << "Error: input directory is not specified" << std::endl;
+        exit(1);
+    } else if (access(m_input_dir.c_str(), F_OK) != 0) {
+        std::cerr << "Error: input directory does not exist" << std::endl;
+        exit(1);
+    } else if (access(m_input_dir.c_str(), R_OK) != 0) {
+        std::cerr << "Error: input directory is not readable" << std::endl;
+        exit(1);
+    }
 }
 
 Config::~Config()

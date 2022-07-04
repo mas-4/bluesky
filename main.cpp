@@ -1,5 +1,6 @@
 #include <iostream>
 #include "src/Config.h"
+#include "src/Site.h"
 
 extern Config *config;
 
@@ -11,5 +12,8 @@ int main(int argc, char *argv[])
     std::cout << config->m_serve_ip << std::endl;
     std::cout << config->m_verbose << std::endl;
     std::cout << config->m_force << std::endl;
+    Site site(config->m_input_dir);
+    site.render();
+    site.write();
     delete config;
 }
