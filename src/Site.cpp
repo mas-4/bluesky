@@ -12,10 +12,14 @@ Site::Site(std::string input_dir)
     // walk the input directory and build a list of pages
     for (const auto &entry : std::filesystem::directory_iterator(m_input_dir))
     {
-        if (entry.is_regular_file()
-        && entry.path().string().find("meta") != std::string::npos)
+        std::string path = entry.path().string();
+        if (entry.is_regular_file())
         {
-            m_pages.push_back(Page(entry.path().string()));
+            // check that the file is not 'meta'
+            if (path.find("meta") == std::string::npos)
+            {
+                m_pages.push_back(Page(path));
+            }
         }
     }
 

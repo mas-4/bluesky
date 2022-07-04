@@ -37,4 +37,4 @@
 
 # End of https://www.toptal.com/developers/gitignore/api/c++
 .idea
-cmake-build*
+*build*

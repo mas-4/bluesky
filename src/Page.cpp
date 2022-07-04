@@ -83,12 +83,10 @@ void Page::render()
                 size_t tag_end = m_raw.find(Constants::CLOSER, name_end) + 1;
                 std::string name = m_raw.substr(name_start + 6,
                                                 name_end - name_start - 6);
-                std::string path = config->m_input_dir + "/" + name + ".html";
+                std::string path = config->m_input_dir + "/_imports/" + name + ".html";
                 std::ifstream file(path);
-                std::stringstream buffer;
-                buffer << file.rdbuf();
+                ss << file.rdbuf();
                 file.close();
-                ss << buffer.str();
                 last_idx = tag_end;
                 break;
             }
@@ -109,7 +107,20 @@ void Page::render()
 
 void Page::write()
 {
+    // create the output directory if it doesn't exist
+    struct stat st;
+    stat(config->m_output_dir.c_str(), &st);
+    if (st.st_mode == 0)
+    {
+        mkdir(config->m_output_dir.c_str(), 0755);
+    }
     std::ofstream file(m_output_path);
+    // check if the file exists
+    if (!file.is_open())
+    {
+        std::cerr << "Could not open file " << m_output_path << std::endl;
+        return;
+    }
     file << m_rendered;
     file.close();
 }
