@@ -2,10 +2,8 @@
 // Created by mas on 7/4/22.
 //
 
-#include <sstream>
 #include <fstream>
 #include <sys/stat.h>
-#include <sstream>
 #include <iostream>
 #include <vector>
 #include <filesystem>
@@ -87,7 +85,7 @@ void Page::render()
             case IT_INCLUDE:
             {
                 size_t name_start = m_raw.find("name=\"", idx);
-                size_t name_end = m_raw.find("\"", name_start + 6);
+                size_t name_end = m_raw.find('"', name_start + 6);
                 size_t tag_end = m_raw.find(Constants::CLOSER, name_end) + 1;
                 std::string name = m_raw.substr(name_start + 6,
                                                 name_end - name_start - 6);
@@ -113,18 +111,6 @@ void Page::render()
     m_rendered = ss.str();
 }
 
-std::vector<std::string> split(std::string str, char delimiter)
-{
-    std::vector<std::string> result;
-    std::stringstream ss(str);
-    std::string item;
-    while (std::getline(ss, item, delimiter))
-    {
-        result.push_back(item);
-    }
-    return result;
-}
-
 void Page::write()
 {
     // create the output directory if it doesn't exist
@@ -142,12 +128,6 @@ void Page::write()
     }
     file << m_rendered;
     file.close();
-}
-
-bool Page::exists()
-{
-    struct stat st;
-    return stat(m_output_path.c_str(), &st) == 0;
 }
 
 Page::~Page()

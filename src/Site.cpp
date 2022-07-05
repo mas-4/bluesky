@@ -14,15 +14,13 @@ Site::Site(std::string input_dir)
     {
         if (!entry.is_directory() && is_valid_page(entry.path().string()))
         {
-            m_pages.push_back(Page(entry.path().string()));
+            m_pages.emplace_back(Page(entry.path().string()));
         }
     }
 }
 
 Site::~Site()
-{
-
-}
+= default;
 
 void Site::render()
 {
@@ -40,7 +38,7 @@ void Site::write()
     }
 }
 
-bool Site::is_valid_page(std::string path)
+bool Site::is_valid_page(const std::string& path)
 {
     if (path.find("meta") != std::string::npos)
     {

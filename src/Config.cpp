@@ -4,8 +4,6 @@
 
 #include "Config.h"
 #include <unistd.h>
-#include <cstring>
-#include <sys/stat.h>
 #include <iostream>
 
 // create a null instance of Config to be initialized by main
@@ -14,7 +12,6 @@ Config *config = nullptr;
 Config::Config(int argc, char *const argv[])
 {
     int ch;
-    size_t length;
     const char* args = "i:o:h:vf";
     while ((ch = getopt(argc, argv, args)) != -1) {
         switch (ch) {

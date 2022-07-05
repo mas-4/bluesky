@@ -21,7 +21,7 @@ private:
     time_t get_last_modified();
     ImportType identify_import(size_t idx);
     void read_file();
-    bool exists();
+
 public:
     explicit Page(std::string path);
     ~Page();
