@@ -61,6 +61,12 @@ ImportType Page::identify_import(size_t idx)
     return IT_UNKNOWN;
 }
 
+std::string get_relative_path(const std::string &path)
+{
+    return path.substr(0, path.find_last_of('/'));
+}
+
+// This function is recursive
 void Page::render()
 {
     if (m_last_modified != get_last_modified())
@@ -85,11 +91,10 @@ void Page::render()
                 size_t tag_end = m_raw.find(Constants::CLOSER, name_end) + 1;
                 std::string name = m_raw.substr(name_start + 6,
                                                 name_end - name_start - 6);
-                std::string path =
-                        config->m_input_dir + "/_imports/" + name + ".html";
-                std::ifstream file(path);
-                ss << file.rdbuf();
-                file.close();
+                std::string path = get_relative_path (m_path) + "/" + name;
+                Page page = Page(path);
+                page.render();
+                ss << page.m_rendered;
                 last_idx = tag_end;
                 break;
             }
