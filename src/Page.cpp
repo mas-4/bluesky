@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <sstream>
 #include <iostream>
+#include <vector>
+#include <filesystem>
 
 #include "Page.h"
 #include "Config.h"
@@ -83,7 +85,8 @@ void Page::render()
                 size_t tag_end = m_raw.find(Constants::CLOSER, name_end) + 1;
                 std::string name = m_raw.substr(name_start + 6,
                                                 name_end - name_start - 6);
-                std::string path = config->m_input_dir + "/_imports/" + name + ".html";
+                std::string path =
+                        config->m_input_dir + "/_imports/" + name + ".html";
                 std::ifstream file(path);
                 ss << file.rdbuf();
                 file.close();
@@ -105,15 +108,26 @@ void Page::render()
     m_rendered = ss.str();
 }
 
+std::vector<std::string> split(std::string str, char delimiter)
+{
+    std::vector<std::string> result;
+    std::stringstream ss(str);
+    std::string item;
+    while (std::getline(ss, item, delimiter))
+    {
+        result.push_back(item);
+    }
+    return result;
+}
+
 void Page::write()
 {
     // create the output directory if it doesn't exist
-    struct stat st;
-    stat(config->m_output_dir.c_str(), &st);
-    if (st.st_mode == 0)
-    {
-        mkdir(config->m_output_dir.c_str(), 0755);
-    }
+    std::string dir_path = m_output_path.substr(
+            0,
+            m_output_path.find_last_of('/')
+    );
+    std::filesystem::create_directories(dir_path);
     std::ofstream file(m_output_path);
     // check if the file exists
     if (!file.is_open())

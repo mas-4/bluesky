@@ -12,6 +12,7 @@ class Site
 private:
     std::vector<Page> m_pages;
     std::string m_input_dir;
+    bool is_valid_page(std::string path);
 public:
     Site(std::string input_dir);
     ~Site();
