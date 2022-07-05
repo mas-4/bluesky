@@ -12,7 +12,7 @@ enum ImportType
     IT_INCLUDE,
     IT_TEMPLATE,
     IT_MARKDOWN,
-    IT_PLACEHOLDER,
+    IT_SLOT,
     IT_UNKNOWN
 };
 
@@ -24,6 +24,7 @@ public:
     static const std::string OPENER;
     static const std::string CLOSER;
     static const int IMPORT_TAG_LENGTH = 4;
+    static const std::string TEMPLATE_END;
 };
 
 #endif //BLUESKY_CONSTANTS_H

@@ -37,6 +37,11 @@ void Page::read_file()
 {
     // read the file
     std::ifstream file(m_path);
+    if (!file.is_open())
+    {
+        std::cout << "Error: failed to open file " << m_path << std::endl;
+        exit(1);
+    }
     std::stringstream buffer;
     buffer << file.rdbuf();
     m_raw = buffer.str();
@@ -64,6 +69,22 @@ std::string get_relative_path(const std::string &path)
     return path.substr(0, path.find_last_of('/'));
 }
 
+// finds an attribute in the given string of the form key="value"
+std::string get_atribute(const std::string &line, const std::string &attribute)
+{
+    size_t start = line.find(attribute);
+    if (start == std::string::npos)
+    {
+        std::cerr << "Error: failed to find attribute " << attribute << " in "
+                  << line << std::endl;
+        exit(1);
+    }
+    start += attribute.length();
+    size_t start_quote = line.find('"', start);
+    size_t end_quote = line.find('"', start_quote + 1);
+    return line.substr(start_quote + 1, end_quote - start_quote - 1);
+}
+
 // This function is recursive
 void Page::render()
 {
@@ -84,26 +105,68 @@ void Page::render()
         {
             case IT_INCLUDE:
             {
-                size_t name_start = m_raw.find("name=\"", idx);
-                size_t name_end = m_raw.find('"', name_start + 6);
-                size_t tag_end = m_raw.find(Constants::CLOSER, name_end) + 1;
-                std::string name = m_raw.substr(name_start + 6,
-                                                name_end - name_start - 6);
-                std::string path = get_relative_path (m_path) + "/" + name;
-                Page page = Page(path);
-                page.render();
-                ss << page.m_rendered;
+                std::string name = get_atribute(m_raw.substr(idx), "name");
+                size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
+                std::string path = get_relative_path(m_path) + "/" + name;
+                Page include = Page(path);
+                include.render();
+                ss << include.m_rendered;
                 last_idx = tag_end;
                 break;
             }
             case IT_TEMPLATE:
+            {
+                std::string name = get_atribute(m_raw.substr(idx), "name");
+                std::string path = get_relative_path(m_path) + "/" + name;
+                Page _template = Page(path);
+                _template.render();
+                std::string slot = get_atribute(m_raw.substr(idx), "slot");
+                size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
+                size_t template_end = m_raw.find(
+                        Constants::TEMPLATE_END,
+                        tag_end
+                ) + Constants::TEMPLATE_END.length();
+                std::string template_content = m_raw.substr(
+                        tag_end,
+                        template_end - tag_end
+                );
+                try
+                {
+                    auto [start, end] = _template.m_slots[slot];
+                    ss << _template.m_rendered.substr(0, start);
+                    ss << template_content;
+                    ss << _template.m_rendered.substr(end);
+                }
+                catch (std::out_of_range &e)
+                {
+                    std::cerr << "Slot " << slot << " not found in " << m_path
+                              << std::endl;
+                }
+
+                last_idx = tag_end;
                 break;
+            }
             case IT_MARKDOWN:
                 break;
-            case IT_PLACEHOLDER:
+            case IT_SLOT:
+            {
+                size_t name_start = m_raw.find("name=\"", idx);
+                size_t name_end = m_raw.find('"', name_start + 6);
+                std::string name = m_raw.substr(name_start + 6,
+                                                name_end - name_start - 6);
+                size_t tag_end = m_raw.find(Constants::CLOSER, name_end) + 1;
+                m_slots[name] = std::make_tuple(idx, tag_end);
+                last_idx = tag_end;
                 break;
+            }
             case IT_UNKNOWN:
-                std::cerr << "Unknown import type" << std::endl;
+            {
+                std::string tag = m_raw.substr(
+                        idx,
+                        m_raw.find(Constants::CLOSER, idx) - idx + 1
+                );
+                std::cerr << "Unknown import type: " << tag << std::endl;
+            }
         }
         idx++;
     }

@@ -10,5 +10,6 @@ const std::string Constants::IMPORT_TAGS[4] = {
         "<bluesky-include",
         "<bluesky-template",
         "<bluesky-markdown",
-        "<bluesky-placeholder"
+        "<bluesky-slot"
 };
+const std::string Constants::TEMPLATE_END = "</bluesky-template>";
