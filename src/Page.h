@@ -2,8 +2,8 @@
 // Created by mas on 7/4/22.
 //
 
-#ifndef SKYBLUE_PAGE_H
-#define SKYBLUE_PAGE_H
+#ifndef BLUESKY_PAGE_H
+#define BLUESKY_PAGE_H
 
 #include <string>
 #include <map>
@@ -29,4 +29,4 @@ public:
     void write();
 };
 
-#endif //SKYBLUE_PAGE_H
+#endif //BLUESKY_PAGE_H

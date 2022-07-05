@@ -2,8 +2,8 @@
 // Created by mas on 7/4/22.
 //
 
-#ifndef SKYBLUE_CONFIG_H
-#define SKYBLUE_CONFIG_H
+#ifndef BLUESKY_CONFIG_H
+#define BLUESKY_CONFIG_H
 
 #include <string>
 
@@ -22,4 +22,4 @@ public:
 };
 
 
-#endif //SKYBLUE_CONFIG_H
+#endif //BLUESKY_CONFIG_H

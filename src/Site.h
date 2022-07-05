@@ -2,8 +2,8 @@
 // Created by mas on 7/4/22.
 //
 
-#ifndef SKYBLUE_SITE_H
-#define SKYBLUE_SITE_H
+#ifndef BLUESKY_SITE_H
+#define BLUESKY_SITE_H
 #include <vector>
 #include "Page.h"
 
@@ -22,4 +22,4 @@ public:
 };
 
 
-#endif //SKYBLUE_SITE_H
+#endif //BLUESKY_SITE_H

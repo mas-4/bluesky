@@ -2,8 +2,8 @@
 // Created by mas on 7/4/22.
 //
 
-#ifndef SKYBLUE_CONSTANTS_H
-#define SKYBLUE_CONSTANTS_H
+#ifndef BLUESKY_CONSTANTS_H
+#define BLUESKY_CONSTANTS_H
 
 #include <string>
 
@@ -26,4 +26,4 @@ public:
     static const int IMPORT_TAG_LENGTH = 4;
 };
 
-#endif //SKYBLUE_CONSTANTS_H
+#endif //BLUESKY_CONSTANTS_H
