@@ -4,12 +4,6 @@
 
 #include "Constants.h"
 
-const std::string Constants::OPENER = "<bluesky-";
-const std::string Constants::CLOSER = ">";
-const std::string Constants::IMPORT_TAGS[4] = {
-        "<bluesky-include",
-        "<bluesky-template",
-        "<bluesky-markdown",
-        "<bluesky-slot"
-};
-const std::string Constants::TEMPLATE_END = "</bluesky-template>";
+namespace Constants
+{
+}

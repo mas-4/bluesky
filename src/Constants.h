@@ -7,24 +7,33 @@
 
 #include <string>
 
-enum ImportType
+namespace Constants
 {
-    IT_INCLUDE,
-    IT_TEMPLATE,
-    IT_MARKDOWN,
-    IT_SLOT,
-    IT_UNKNOWN
-};
+
+    enum ImportType
+    {
+        IT_INCLUDE,
+        IT_TEMPLATE,
+        IT_MARKDOWN,
+        IT_SLOT,
+        IT_BLOCK,
+        IT_BLOCK_END,
+        IT_UNKNOWN
+    };
+    static const size_t IMPORT_TAG_LENGTH = 6;
+    static const std::string OPENER = "<bluesky-";
+    static const std::string CLOSER = ">";
+    static const std::string IMPORT_TAGS[IMPORT_TAG_LENGTH] = {
+            "<bluesky-include",
+            "<bluesky-template",
+            "<bluesky-markdown",
+            "<bluesky-slot",
+            "<bluesky-block",
+            "</bluesky-block>"
+    };
+    static const std::string TEMPLATE_END = "</bluesky-template>";
 
 
-class Constants
-{
-public:
-    static const std::string IMPORT_TAGS[4];
-    static const std::string OPENER;
-    static const std::string CLOSER;
-    static const int IMPORT_TAG_LENGTH = 4;
-    static const std::string TEMPLATE_END;
-};
+}
 
 #endif //BLUESKY_CONSTANTS_H

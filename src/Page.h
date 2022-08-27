@@ -8,6 +8,8 @@
 #include <string>
 #include <map>
 #include "Constants.h"
+#include "Page.h"
+#include "Block.h"
 
 
 class Page
@@ -17,16 +19,17 @@ private:
     std::string m_output_path;
     std::string m_raw;
     std::string m_rendered;
-    std::map <std::string, std::tuple<size_t, size_t>> m_slots;
+    Page *m_template;
     time_t m_last_modified;
-    time_t get_last_modified();
-    ImportType identify_import(size_t idx);
+    std::map<std::string, Block> m_blocks;
     void read_file();
 
 public:
     explicit Page(std::string path);
     ~Page();
     void render();
+    std::string get_raw() { return m_raw; };
+    std::string get_rendered() { return m_rendered; };
     void write();
 };
 
