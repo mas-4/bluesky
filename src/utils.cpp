@@ -9,33 +9,27 @@ Constants::ImportType
 utils::identify_import(const std::string &raw, size_t idx)
 {
     for (int i = 0; i < Constants::IMPORT_TAG_LENGTH; i++)
-    {
-        bool match = raw.substr(
-                idx,
-                Constants::IMPORT_TAGS[i].length()
-        ) == Constants::IMPORT_TAGS[i];
-        if (match)
-        {
+        if (raw.substr(idx, Constants::IMPORT_TAGS[i].length()) == Constants::IMPORT_TAGS[i])
             return (Constants::ImportType) i;
-        }
-    }
     return Constants::IT_UNKNOWN;
 }
 
+[[maybe_unused]]
 time_t get_last_modified(const std::string &path)
 {
-    struct stat st;
+    struct stat st{};
     stat(path.c_str(), &st);
     return st.st_mtime;
 }
 
+[[maybe_unused]]
 std::string get_relative_path(const std::string &path)
 {
     return path.substr(0, path.find_last_of('/'));
 }
 
-std::string
-get_attribute(const std::string &line, const std::string &attribute)
+[[maybe_unused]]
+std::string get_attribute(const std::string &line, const std::string &attribute)
 {
     size_t start = line.find(attribute);
     if (start == std::string::npos)

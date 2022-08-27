@@ -26,7 +26,7 @@ private:
 
 public:
     explicit Page(std::string path);
-    ~Page();
+    ~Page() = default;
     void render();
     std::string get_raw() { return m_raw; };
     std::string get_rendered() { return m_rendered; };

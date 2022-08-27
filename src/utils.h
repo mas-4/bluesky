@@ -16,8 +16,7 @@ namespace utils
 
     std::string get_relative_path(const std::string &path);
 
-    std::string
-    get_attribute(const std::string &line, const std::string &attribute);
+    std::string get_attribute(const std::string &line, const std::string &attribute);
 }
 
 

@@ -15,7 +15,7 @@ private:
     static bool is_valid_page(const std::string& path);
 public:
     explicit Site(std::string input_dir);
-    ~Site();
+    ~Site() = default;
 
     void render();
     void write();
