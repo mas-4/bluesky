@@ -21,8 +21,8 @@ private:
     std::string m_rendered;
     Page *m_template;
     time_t m_last_modified;
-    std::map<std::string, Block> m_blocks;
     void read_file();
+    bool is_templated();
 
 public:
     explicit Page(std::string path);

@@ -4,8 +4,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <vector>
-#include <stack>
 #include <sstream>
 #include <algorithm>
 #include <filesystem>
@@ -43,7 +41,15 @@ void Page::read_file()
 // This function is recursive
 void Page::render()
 {
-    // render the file
+    if (!is_templated()) // the file is not templated, therefore we can directly render it
+    {
+        auto tmp = Block(m_raw, m_path);
+        tmp.render();
+        m_rendered = tmp.get_rendered();
+        return;
+    }
+
+    // the file is templated, therefore we have to switch on it
     size_t idx = 0;
     Constants::ImportType it;
     size_t last_idx = 0;
@@ -71,11 +77,12 @@ void Page::render()
                 size_t block_end_start = m_raw.find(Constants::IMPORT_TAGS[Constants::IT_BLOCK_END]);
                 size_t block_end_end = m_raw.find(Constants::CLOSER, block_end_start + 1);
                 std::string path = utils::get_relative_path(m_path) + "/" + name;
-                m_blocks[name] = Block(m_raw.substr(tag_end, block_end_start - tag_end), path);
+                auto block = Block(m_raw.substr(tag_end, block_end_start - tag_end), path);
+                block.render();
+                ss << block.get_rendered();
                 last_idx = block_end_end;
                 break;
             }
-            case Constants::IT_SLOT:
 
             default:
                 last_idx = idx;
@@ -98,4 +105,12 @@ void Page::write()
     }
     file << m_rendered;
     file.close();
+}
+
+bool Page::is_templated()
+{
+    size_t idx = m_raw.find(Constants::OPENER, 0);
+    if (idx == std::string::npos)
+        return false;
+    return utils::identify_import(m_raw, idx) == Constants::IT_TEMPLATE;
 }

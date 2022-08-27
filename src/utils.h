@@ -6,13 +6,12 @@
 #define BLUESKY_UTILS_H
 
 #include "Constants.h"
-#include "sys/stat.h"
 
 namespace utils
 {
     Constants::ImportType identify_import(const std::string &raw, size_t idx);
 
-    time_t get_last_modified(std::string path);
+    time_t get_last_modified(const std::string &path);
 
     std::string get_relative_path(const std::string &path);
 
