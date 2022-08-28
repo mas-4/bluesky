@@ -10,15 +10,16 @@
 
 namespace utils
 {
-    typedef std::unordered_map<std::string, std::tuple<size_t, size_t, size_t>> SlotMap;
-
     Constants::ImportType identify_import(const std::string &raw, size_t idx);
 
+    [[maybe_unused]]
     time_t get_last_modified(const std::string &path);
 
     std::string get_relative_path(const std::string &path);
 
     std::string get_attribute(const std::string &line, const std::string &attribute);
+
+    std::string read_file(const std::string &path);
 }
 
 

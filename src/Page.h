@@ -10,6 +10,7 @@
 #include "Constants.h"
 #include "Page.h"
 #include "Block.h"
+#include "Template.h"
 #include "utils.h"
 
 
@@ -20,18 +21,13 @@ private:
     std::string m_output_path;
     std::string m_raw;
     std::string m_rendered;
-    Page *m_template = nullptr;
-    utils::SlotMap m_slots;
-    time_t m_last_modified;
-    void read_file();
+    Template *m_template = nullptr;
     bool is_templated();
+    void render();
 
 public:
     explicit Page(std::string path);
     ~Page();
-
-    void render();
-    std::string get_raw() { return m_raw; };
     std::string get_rendered() { return m_rendered; };
     void write();
 };

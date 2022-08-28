@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
     std::cout << "Verbose: " << config->m_verbose << std::endl;
     std::cout << "Force: " << config->m_force << std::endl;
     Site site(config->m_input_dir);
-    site.render();
     site.write();
     delete config;
 }

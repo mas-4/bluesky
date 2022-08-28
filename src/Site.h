@@ -17,7 +17,6 @@ public:
     explicit Site(std::string input_dir);
     ~Site() = default;
 
-    void render();
     void write();
 };
 

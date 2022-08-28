@@ -18,14 +18,6 @@ Site::Site(std::string input_dir)
     }
 }
 
-void Site::render()
-{
-    for (auto &page: m_pages)
-    {
-        page.render();
-    }
-}
-
 void Site::write()
 {
     for (auto &page: m_pages)

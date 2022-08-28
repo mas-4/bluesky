@@ -4,6 +4,8 @@
 
 #include "utils.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "sys/stat.h"
 
 Constants::ImportType utils::identify_import(const std::string &raw, size_t idx)
@@ -39,4 +41,18 @@ std::string utils::get_attribute(const std::string &line, const std::string &att
     size_t start_quote = line.find('"', start);
     size_t end_quote = line.find('"', start_quote + 1);
     return line.substr(start_quote + 1, end_quote - start_quote - 1);
+}
+
+std::string utils::read_file(const std::string &path)
+{
+    std::ifstream file(path);
+    if (!file.is_open())
+    {
+        std::cerr << "Error: failed to open file " << path << std::endl;
+        exit(1);
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    file.close();
+    return buffer.str();
 }
