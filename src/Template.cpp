@@ -28,7 +28,6 @@ void Template::render()
 Template::Template(std::string path)
 : m_raw(utils::read_file(path)), m_path(std::move(path))
 {
-    std::cout << "Rendering template: " << m_path << std::endl;
     render();
 }
 

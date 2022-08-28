@@ -13,8 +13,6 @@
 Block::Block(std::string raw, std::string path)
 : m_raw(std::move(raw)), m_path(std::move(path))
 {
-    std::cout << "Rendering block: " << m_path << std::endl;
-    std::cout << m_raw << std::endl;
     render();
 }
 

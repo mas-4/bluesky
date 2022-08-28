@@ -19,7 +19,6 @@ Page::Page(std::string path)
 {
     m_output_path = config->m_output_dir + m_path.substr(config->m_input_dir.size());
     m_raw = utils::read_file(m_path);
-    std::cout << "Rendering page: " << m_path << std::endl;
     render();
 }
 
@@ -87,5 +86,8 @@ bool Page::is_templated()
 
 Page::~Page()
 {
-    delete m_template;
+    // TODO memory leak with template and new
+    // Destructor is called multiple times on the same pointer, why?
+    std::cout << (void*)m_template << std::endl;
+    // delete m_template;
 }
