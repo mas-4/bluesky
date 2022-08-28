@@ -16,4 +16,4 @@ add_executable(bluesky
         src/Block.cpp
         src/Block.h
         src/utils.cpp
-        src/utils.h src/Template.cpp src/Template.h)
+        src/utils.h src/Template.cpp src/Template.h src/Meta.cpp src/Meta.h)
