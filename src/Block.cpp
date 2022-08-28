@@ -55,4 +55,5 @@ void Block::render()
         }
         idx = last_idx;
     }
+    m_rendered = ss.str();
 }

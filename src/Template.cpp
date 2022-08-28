@@ -15,14 +15,14 @@ void Template::render()
     while ((idx = m_raw.find(Constants::IMPORT_TAGS[Constants::IT_SLOT], idx)) != std::string::npos)
     {
         // render previous block
-        m_blocks.emplace_back(Block(m_raw.substr(last_idx, idx - last_idx), m_path).get_rendered());
+        m_blocks.push_back(Block(m_raw.substr(last_idx, idx - last_idx), m_path).get_rendered());
         // save the slot
-        m_blocks.emplace_back(utils::get_attribute(m_raw.substr(idx), "name"));
+        m_blocks.push_back(utils::get_attribute(m_raw.substr(idx), "name"));
         // move on
         last_idx = m_raw.find(Constants::CLOSER, idx) + 1;
         idx = last_idx;
     }
-    m_blocks.emplace_back(Block(m_raw.substr(last_idx), m_path).get_rendered());
+    m_blocks.push_back(Block(m_raw.substr(last_idx), m_path).get_rendered());
 }
 
 Template::Template(std::string path)
