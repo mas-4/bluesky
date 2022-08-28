@@ -21,7 +21,7 @@ private:
     std::string m_output_path;
     std::string m_raw;
     std::string m_rendered;
-    Template *m_template = nullptr;
+    Template *m_template;
     bool is_templated();
     void render();
 

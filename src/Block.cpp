@@ -13,6 +13,8 @@
 Block::Block(std::string raw, std::string path)
 : m_raw(std::move(raw)), m_path(std::move(path))
 {
+    std::cout << "Rendering block: " << m_path << std::endl;
+    std::cout << m_raw << std::endl;
     render();
 }
 
@@ -26,12 +28,11 @@ void Block::render()
     {
         it = utils::identify_import(m_raw, idx);
         ss << m_raw.substr(last_idx, idx - last_idx);
-        auto forward_str = m_raw.substr(idx);
         switch (it)
         {
             case Constants::IT_INCLUDE:
             {
-                std::string name = utils::get_attribute(forward_str, "name");
+                std::string name = utils::get_attribute(m_raw.substr(idx), "name");
                 size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
                 std::string path = utils::get_relative_path(m_path) + "/" + name;
                 auto content = utils::read_file(path);
@@ -46,9 +47,14 @@ void Block::render()
                 std::string tag = m_raw.substr(idx, m_raw.find(Constants::CLOSER, idx) - idx + 1);
                 std::cerr << "Unknown import type: " << tag << std::endl;
                 last_idx = tag_end;
+                break;
             }
             default:
+            {
+                last_idx = m_raw.find(Constants::CLOSER, idx) + 1;
                 break;
+            }
         }
+        idx = last_idx;
     }
 }

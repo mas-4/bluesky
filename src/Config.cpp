@@ -12,9 +12,11 @@ Config *config = nullptr;
 Config::Config(int argc, char *const argv[])
 {
     int ch;
-    const char* args = "i:o:h:vf";
-    while ((ch = getopt(argc, argv, args)) != -1) {
-        switch (ch) {
+    const char *args = "i:o:h:vf";
+    while ((ch = getopt(argc, argv, args)) != -1)
+    {
+        switch (ch)
+        {
             case 'i':
                 m_input_dir = std::string(optarg);
                 break;
@@ -35,14 +37,17 @@ Config::Config(int argc, char *const argv[])
         }
     }
     // check if input directory is valid
-    if (m_input_dir.empty()) {
+    if (m_input_dir.empty())
+    {
         std::cerr << "Error: input directory is not specified" << std::endl;
         std::cerr << "Usage: " << argv[0] << " -i <input directory>" << std::endl;
         exit(1);
-    } else if (access(m_input_dir.c_str(), F_OK) != 0) {
+    } else if (access(m_input_dir.c_str(), F_OK) != 0)
+    {
         std::cerr << "Error: input directory does not exist" << std::endl;
         exit(1);
-    } else if (access(m_input_dir.c_str(), R_OK) != 0) {
+    } else if (access(m_input_dir.c_str(), R_OK) != 0)
+    {
         std::cerr << "Error: input directory is not readable" << std::endl;
         exit(1);
     }

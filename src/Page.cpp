@@ -19,6 +19,7 @@ Page::Page(std::string path)
 {
     m_output_path = config->m_output_dir + m_path.substr(config->m_input_dir.size());
     m_raw = utils::read_file(m_path);
+    std::cout << "Rendering page: " << m_path << std::endl;
     render();
 }
 
@@ -38,34 +39,22 @@ void Page::render()
     size_t tmpl_idx = m_raw.find(Constants::OPENER);
     if (utils::identify_import(m_raw, idx) != Constants::IT_TEMPLATE)
     {
-        // make console red
-        std::cout << "\033[1;31m";
-        std::cerr << "Error: Invalid template use in " << m_path << "." << std::endl;
-        // return console to normal
-        std::cout << "\033[0m";
+        std::cerr << "Error: <bluesky-template /> must be the first bluesky tag in a file" << m_path << "."
+                  << std::endl;
         std::cerr << m_raw << std::endl;
         exit(1);
     }
 
     m_template = new Template(utils::get_relative_path(m_path) + "/" + utils::get_attribute(m_raw.substr(idx), "name"));
-    while ((idx = m_raw.find(Constants::OPENER, idx)) != std::string::npos)
+    while ((idx = m_raw.find(Constants::IMPORT_TAGS[Constants::IT_BLOCK], idx)) != std::string::npos)
     {
-        it = utils::identify_import(m_raw, idx);
-        if (it == Constants::IT_BLOCK)
-        {
-            std::string name = utils::get_attribute(m_raw.substr(idx), "name");
-            size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
-            size_t block_end_start = m_raw.find(Constants::IMPORT_TAGS[Constants::IT_BLOCK_END]);
-            size_t block_end_end = m_raw.find(Constants::CLOSER, block_end_start + 1);
-            std::string path = utils::get_relative_path(m_path) + "/" + name;
-            auto block = Block(m_raw.substr(tag_end, block_end_start - tag_end), path);
-            blocks[name] = block.get_rendered();
-        } else
-        {
-            std::cerr << "Error: Invalid template use in " << m_path << "." << std::endl;
-            std::cerr << "Identified text outside of blocks." << std::endl;
-            exit(1);
-        }
+        std::string name = utils::get_attribute(m_raw.substr(idx), "name");
+        size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
+        size_t block_end_start = m_raw.find(Constants::IMPORT_TAGS[Constants::IT_BLOCK_END], tag_end);
+        size_t block_end_end = m_raw.find(Constants::CLOSER, block_end_start + 1);
+        auto block = Block(m_raw.substr(tag_end, block_end_start - tag_end), m_path);
+        blocks[name] = block.get_rendered();
+        idx = block_end_end + 1;
     }
     m_rendered = m_template->render(blocks);
 }
