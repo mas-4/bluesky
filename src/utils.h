@@ -6,9 +6,12 @@
 #define BLUESKY_UTILS_H
 
 #include "Constants.h"
+#include <unordered_map>
 
 namespace utils
 {
+    typedef std::unordered_map<std::string, std::tuple<size_t, size_t, size_t>> SlotMap;
+
     Constants::ImportType identify_import(const std::string &raw, size_t idx);
 
     time_t get_last_modified(const std::string &path);

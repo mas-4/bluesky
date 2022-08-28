@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <filesystem>
 
-#include "utils.h"
 #include "Page.h"
 #include "Config.h"
 #include "Block.h"
@@ -46,6 +45,7 @@ void Page::render()
         auto tmp = Block(m_raw, m_path);
         tmp.render();
         m_rendered = tmp.get_rendered();
+        m_slots = tmp.get_slots();
         return;
     }
 
@@ -79,6 +79,10 @@ void Page::render()
                 std::string path = utils::get_relative_path(m_path) + "/" + name;
                 auto block = Block(m_raw.substr(tag_end, block_end_start - tag_end), path);
                 block.render();
+                auto [prev, here, next] = m_slots[name];
+                ss << m_template->get_rendered().substr(prev, here - prev);
+                ss << block.get_rendered();
+                ss << m_template->get_rendered().substr(here, next - here);
                 ss << block.get_rendered();
                 last_idx = block_end_end;
                 break;
@@ -113,4 +117,9 @@ bool Page::is_templated()
     if (idx == std::string::npos)
         return false;
     return utils::identify_import(m_raw, idx) == Constants::IT_TEMPLATE;
+}
+
+Page::~Page()
+{
+    delete m_template;
 }

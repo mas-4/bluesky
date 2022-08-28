@@ -15,6 +15,7 @@ namespace Constants
         IT_INCLUDE,
         IT_TEMPLATE,
         IT_MARKDOWN,
+        IT_SLOT,
         IT_BLOCK,
         IT_BLOCK_END,
         IT_UNKNOWN
@@ -26,6 +27,7 @@ namespace Constants
             "<bluesky-include",
             "<bluesky-template",
             "<bluesky-markdown",
+            "<bluesky-slot",
             "<bluesky-block",
             "</bluesky-block>"
     };
