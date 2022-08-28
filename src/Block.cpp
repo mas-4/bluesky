@@ -55,5 +55,6 @@ void Block::render()
         }
         idx = last_idx;
     }
+    ss << m_raw.substr(last_idx);
     m_rendered = ss.str();
 }
