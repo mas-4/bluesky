@@ -18,9 +18,10 @@ namespace Constants
         IT_SLOT,
         IT_BLOCK,
         IT_BLOCK_END,
-        IT_UNKNOWN
+        IT_UNKNOWN,
+        IT_CODE
     };
-    static const size_t IMPORT_TAG_LENGTH = 6;
+    static const size_t IMPORT_TAG_LENGTH = 7;
     static const std::string OPENER = "<bluesky-";
     static const std::string CLOSER = ">";
     static const std::string IMPORT_TAGS[IMPORT_TAG_LENGTH] = {
@@ -29,7 +30,8 @@ namespace Constants
             "<bluesky-markdown",
             "<bluesky-slot",
             "<bluesky-block",
-            "</bluesky-block>"
+            "</bluesky-block>",
+            "```",
     };
     static const std::string TEMPLATE_END = "</bluesky-template>";
 

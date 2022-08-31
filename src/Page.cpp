@@ -153,5 +153,4 @@ Page::Page(const Page &page)
     m_template = nullptr;
     m_slot = page.m_slot;
     m_children = page.m_children;
-    std::cout << "Copying" << std::endl;
 }
