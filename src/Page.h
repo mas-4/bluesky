@@ -7,6 +7,8 @@
 
 #include <vector>
 #include <string>
+#include <memory>
+
 #include "Constants.h"
 #include "Page.h"
 #include "Block.h"
@@ -23,14 +25,15 @@ private:
     std::string m_raw;
     std::string m_slot;
     std::string m_rendered;
-    Template *m_template = nullptr;
+    std::shared_ptr<Template> m_template;
     bool is_templated();
     void render();
 
 public:
     explicit Page(std::string path);
-    Page(std::string path, Template *templ, std::string slot);
-    ~Page();
+    Page(const Page &page); // copy constructor
+    Page(std::string path, std::shared_ptr<Template> templ, std::string slot);
+    ~Page() = default;
     void write();
 };
 

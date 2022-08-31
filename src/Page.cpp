@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <unordered_map>
+#include <utility>
 
 #include "Page.h"
 #include "Config.h"
@@ -23,8 +24,8 @@ Page::Page(std::string path)
     render();
 }
 
-Page::Page(std::string path, Template *templ, std::string slot)
-        : m_path(std::move(path)), m_template(templ), m_slot(std::move(slot))
+Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
+        : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot))
 {
     std::string filepath = m_path.substr(config->m_input_dir.size());
     // replace .md with .html if it's a markdown file
@@ -62,6 +63,7 @@ void Page::render()
         std::string templ = utils::get_attribute(m_raw.substr(idx), "template");
         std::string templ_path = utils::get_relative_path(m_path) + "/" + templ;
         Template template_obj(templ_path);
+        std::shared_ptr<Template> template_ptr = std::make_shared<Template>(template_obj);
         std::string slot = utils::get_attribute(m_raw.substr(idx), "slot");
         ss << "<ul>";
         // iterate through files in directory
@@ -71,7 +73,7 @@ void Page::render()
             if (p.path().extension() == ".md")
             {
                 ss << "<li><a href=\"" << p.path().filename() << "\">" << p.path().filename() << "</a></li>";
-                m_children.emplace_back(Page(file_path, &template_obj, slot));
+                m_children.emplace_back(Page(file_path, template_ptr, slot));
             }
         }
         ss << "</ul>";
@@ -90,8 +92,12 @@ void Page::render()
         std::cerr << tmp << std::endl;
         exit(1);
     }
-
-    m_template = new Template(utils::get_relative_path(m_path) + "/" + utils::get_attribute(tmp.substr(idx), "name"));
+    // instantiate template shared_ptr
+    std::string templ_path_raw = utils::get_attribute(tmp.substr(tmpl_idx), "template");
+    std::string templ_path = utils::get_relative_path(m_path) + "/" + templ_path_raw;
+    Template template_obj(templ_path);
+    std::shared_ptr<Template> template_ptr = std::make_shared<Template>(template_obj);
+    m_template = template_ptr;
     while ((idx = tmp.find(Constants::IMPORT_TAGS[Constants::IT_BLOCK], idx)) != std::string::npos)
     {
         std::string name = utils::get_attribute(tmp.substr(idx), "name");
@@ -129,9 +135,7 @@ void Page::write()
 bool Page::is_templated()
 {
     if (m_template != nullptr)
-    {
         return true;
-    }
     size_t idx = m_raw.find(Constants::OPENER, 0);
     if (idx == std::string::npos)
     {
@@ -140,10 +144,14 @@ bool Page::is_templated()
     return utils::identify_import(m_raw, idx) == Constants::IT_TEMPLATE;
 }
 
-Page::~Page()
+Page::Page(const Page &page)
 {
-    // TODO memory leak with template and new
-    // Destructor is called multiple times on the same pointer, why?
-    std::cout << (void *) m_template << std::endl;
-    // delete m_template;
+    m_path = page.m_path;
+    m_output_path = page.m_output_path;
+    m_raw = page.m_raw;
+    m_rendered = page.m_rendered;
+    m_template = nullptr;
+    m_slot = page.m_slot;
+    m_children = page.m_children;
+    std::cout << "Copying" << std::endl;
 }
