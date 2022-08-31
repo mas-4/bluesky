@@ -5,8 +5,8 @@
 #ifndef BLUESKY_PAGE_H
 #define BLUESKY_PAGE_H
 
+#include <vector>
 #include <string>
-#include <unordered_map>
 #include "Constants.h"
 #include "Page.h"
 #include "Block.h"
@@ -18,17 +18,19 @@ class Page
 {
 private:
     std::string m_path;
+    std::vector<Page> m_children;
     std::string m_output_path;
     std::string m_raw;
+    std::string m_slot;
     std::string m_rendered;
-    Template *m_template;
+    Template *m_template = nullptr;
     bool is_templated();
     void render();
 
 public:
     explicit Page(std::string path);
+    Page(std::string path, Template *templ, std::string slot);
     ~Page();
-    std::string get_rendered() { return m_rendered; };
     void write();
 };
 

@@ -9,10 +9,9 @@
 #include <sstream>
 #include <iostream>
 #include <utility>
-#include "Template.h"
 
 Block::Block(std::string raw, std::string path)
-: m_raw(std::move(raw)), m_path(std::move(path))
+        : m_raw(std::move(raw)), m_path(std::move(path))
 {
     render();
 }
@@ -40,7 +39,6 @@ void Block::render()
                 last_idx = tag_end;
                 break;
             }
-
             case Constants::IT_UNKNOWN:
             {
                 size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
