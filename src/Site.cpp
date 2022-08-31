@@ -36,5 +36,9 @@ bool Site::is_valid_page(const std::string &path)
     {
         return false;
     }
+    if (path.find(".md") != std::string::npos)
+    {
+        return false;
+    }
     return true;
 }

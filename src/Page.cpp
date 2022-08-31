@@ -26,7 +26,11 @@ Page::Page(std::string path)
 Page::Page(std::string path, Template *templ, std::string slot)
         : m_path(std::move(path)), m_template(templ), m_slot(std::move(slot))
 {
-    m_output_path = config->m_output_dir + m_path.substr(config->m_input_dir.size());
+    std::string filepath = m_path.substr(config->m_input_dir.size());
+    // replace .md with .html if it's a markdown file
+    if (filepath.find(".md") != std::string::npos)
+        filepath.replace(filepath.find(".md"), 3, ".html");
+    m_output_path = config->m_output_dir + filepath;
     m_raw = utils::read_file(m_path);
     render();
 }
