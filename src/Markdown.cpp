@@ -30,6 +30,10 @@
  * IN THE SOFTWARE.
  */
 
+/*
+ * Heavily modified by Michael Sendker on 9/2/22.
+ */
+
 #include "Constants.h"
 
 #include "md4c-html.h"
