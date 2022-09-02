@@ -3,7 +3,6 @@
 //
 
 #include "Markdown.h"
-#include <cstdlib>
 #include <iostream>
 
 /*
@@ -31,10 +30,7 @@
  * IN THE SOFTWARE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include "Constants.h"
 
 #include "md4c-html.h"
 
@@ -42,14 +38,7 @@
 
 /* Global options. */
 static unsigned parser_flags = 0;
-#ifndef MD4C_USE_ASCII
-static unsigned renderer_flags = MD_HTML_FLAG_DEBUG | MD_HTML_FLAG_SKIP_UTF8_BOM;
-#else
-static unsigned renderer_flags = MD_HTML_FLAG_DEBUG;
-#endif
-static int want_fullhtml = 0;
-static int want_xhtml = 0;
-static int want_stat = 0;
+static unsigned renderer_flags = Constants::MD_FLAGS;
 
 
 /*********************************
@@ -74,7 +63,7 @@ membuf_init(struct membuffer* buf, MD_SIZE new_asize)
     buf->size = 0;
     buf->asize = new_asize;
     buf->data = (char*)malloc(buf->asize);
-    if(buf->data == NULL) {
+    if(buf->data == nullptr) {
         fprintf(stderr, "membuf_init: malloc() failed.\n");
         exit(1);
     }
@@ -91,7 +80,7 @@ static void
 membuf_grow(struct membuffer* buf, size_t new_asize)
 {
     buf->data = (char*)realloc(buf->data, new_asize);
-    if(buf->data == NULL) {
+    if(buf->data == nullptr) {
         fprintf(stderr, "membuf_grow: realloc() failed.\n");
         exit(1);
     }
@@ -121,11 +110,8 @@ process_output(const MD_CHAR* text, MD_SIZE size, void* userdata)
 
 std::string Markdown::parse(const std::string &raw)
 {
-    MD_SIZE n;
     struct membuffer buf_in = {0};
     struct membuffer buf_out = {0};
-    int ret = -1;
-    clock_t t0, t1;
 
     membuf_init(&buf_in, 32 * 1024);
 
@@ -141,7 +127,7 @@ std::string Markdown::parse(const std::string &raw)
      * deal with the HTML header/footer and tags. */
     membuf_init(&buf_out, buf_in.size + buf_in.size/8 + 64);
 
-    ret = md_html(buf_in.data, buf_in.size, process_output, (void*) &buf_out,
+    int ret = md_html(buf_in.data, buf_in.size, process_output, (void*) &buf_out,
                   parser_flags, renderer_flags);
 
     if(ret != 0) {
@@ -153,10 +139,6 @@ std::string Markdown::parse(const std::string &raw)
     buf_out.data[buf_out.size] = '\0';
     std::string output(buf_out.data);
 
-    /* Success if we have reached here. */
-    ret = 0;
-
-    out:
     membuf_fini(&buf_in);
     membuf_fini(&buf_out);
     return output;
