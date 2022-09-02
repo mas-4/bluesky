@@ -13,6 +13,7 @@
 #include "Page.h"
 #include "Config.h"
 #include "Block.h"
+#include "Markdown.h"
 
 extern Config *config;
 
@@ -46,7 +47,7 @@ void Page::render()
     } else if (m_path.ends_with(".md"))
     {
         std::unordered_map<std::string, std::string> blocks;
-        blocks[m_slot] = Block(m_raw, m_path).get_rendered();
+        blocks[m_slot] = Markdown::parse(m_raw);
         m_rendered = m_template->render(blocks);
         return;
     }

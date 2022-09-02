@@ -3,12 +3,9 @@ project(bluesky)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(MD4C tpc/md4c-release-0.4.8)
+set(MD4C tpc/md4c)
 
-add_subdirectory(${MD4C}/src)
-
-add_executable(bluesky
-        main.cpp
+set(CXX_SRC main.cpp
         src/Config.cpp
         src/Site.cpp
         src/Page.cpp
@@ -17,7 +14,13 @@ add_executable(bluesky
         src/utils.cpp
         src/Template.cpp
         src/Meta.cpp
-        src/Meta.h)
+        src/Markdown.cpp
+        ${MD4C}/entity.c
+        ${MD4C}/md4c.c
+        ${MD4C}/md4c-html.c)
 
-target_link_libraries(bluesky md4c)
-target_include_directories(bluesky PUBLIC ${MD4C}/src)
+
+add_executable(bluesky ${CXX_SRC})
+
+
+target_include_directories(bluesky PUBLIC ${MD4C})

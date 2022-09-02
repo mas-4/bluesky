@@ -6,6 +6,7 @@
 #define BLUESKY_CONSTANTS_H
 
 #include <string>
+#include "md4c.h"
 
 namespace Constants
 {
@@ -21,6 +22,9 @@ namespace Constants
         IT_UNKNOWN,
         IT_CODE
     };
+    static const unsigned MD_FLAGS = MD_FLAG_COLLAPSEWHITESPACE | MD_FLAG_TABLES | MD_FLAG_TASKLISTS |
+            MD_FLAG_STRIKETHROUGH | MD_FLAG_PERMISSIVEAUTOLINKS | MD_FLAG_PERMISSIVEWWWAUTOLINKS |
+            MD_FLAG_LATEXMATHSPANS;
     static const size_t IMPORT_TAG_LENGTH = 7;
     static const std::string OPENER = "<bluesky-";
     static const std::string CLOSER = ">";
