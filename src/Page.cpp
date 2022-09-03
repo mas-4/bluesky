@@ -3,8 +3,6 @@
 //
 
 #include <fstream>
-#include <iostream>
-#include <sstream>
 #include <algorithm>
 #include <filesystem>
 #include <unordered_map>
@@ -22,7 +20,10 @@ extern Meta *meta;
 Page::Page(std::string path)
         : m_path(std::move(path))
 {
+    m_filename = std::filesystem::path(m_path).filename().string();
+    m_name = m_filename.substr(0, m_filename.find_last_of('.'));
     m_output_path = config->m_output_dir + m_path.substr(config->m_input_dir.size());
+
     m_raw = utils::read_file(m_path);
     render();
 }
@@ -58,18 +59,31 @@ void Page::render_markdown_tags()
         Template template_obj(templ_path);
         std::shared_ptr<Template> template_ptr = std::make_shared<Template>(template_obj);
         std::string slot = utils::get_attribute(m_raw.substr(idx), "slot");
-        ss << "<ul>\n";
+        std::string sort_key = utils::get_attribute(m_raw.substr(idx), "sort");
+        std::string title = utils::get_attribute(m_raw.substr(idx), "title");
         // iterate through files in directory
         for (auto &p: std::filesystem::directory_iterator(dir_path))
         {
             std::string file_path = p.path().string();
             if (p.path().extension() == ".md")
             {
-                ss << "<li><a href=\"" << p.path().filename() << "\">" << p.path().filename() << "</a></li>\n";
                 m_children.emplace_back(Page(file_path, template_ptr, slot));
             }
         }
-        ss << "</ul>";
+        /*
+        std::sort(m_children.begin(), m_children.end(), [&sort_key](const Page &a, const Page &b) {
+            return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
+        });
+         */
+
+        for (auto &child: m_children)
+        {
+            ss << "<ul>\n";
+            // get relative path to m_output_path
+            std::string rel_path = utils::get_final_path(m_output_path, child.get_out_path());
+            ss << "<li><a href=\"" << rel_path << "\">" << child.get_frontmatter(title) << "</a></li>\n";
+            ss << "</ul>";
+        }
         idx = last_idx;
     }
     ss << m_raw.substr(last_idx);
@@ -157,10 +171,16 @@ void Page::render()
     else if (m_path.ends_with(".md"))
     {
         auto frontmatter = Markdown::parse_frontmatter(m_raw);
+        // copy frontmatter to m_frontmatter
+        for (auto &pair: frontmatter)
+        {
+            m_frontmatter[pair.first] = pair.second;
+            std::cout << pair.first << " " << pair.second << std::endl;
+        }
         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw.substr(frontmatter_end));
-        m_rendered = m_template->render(blocks, frontmatter);
+        m_rendered = m_template->render(blocks, m_frontmatter);
         // do not render variables for frontmatter for a markdown file
         return;
     }

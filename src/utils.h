@@ -17,6 +17,8 @@ namespace utils
 
     std::string get_relative_path(const std::string &path);
 
+    std::string get_final_path(const std::string &parent_path, const std::string &path);
+
     std::string get_attribute(const std::string &line, const std::string &attribute);
 
     std::string read_file(const std::string &path);

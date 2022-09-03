@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <iostream>
 
 #include "Constants.h"
 #include "Page.h"
@@ -22,22 +23,49 @@ private:
     std::string m_path;
     std::vector<Page> m_children;
     std::string m_output_path;
+    std::string m_filename;
+    std::string m_name;
     std::string m_raw;
     std::string m_slot;
     std::string m_rendered;
     std::shared_ptr<Template> m_template;
+    std::unordered_map<std::string, std::string> m_frontmatter;
+
     bool is_templated();
+
     void render();
+
     void render_markdown_tags();
+
     void render_templating();
+
     void render_variables();
 
 public:
     explicit Page(std::string path);
+
     Page(const Page &page); // copy constructor
     Page(std::string path, std::shared_ptr<Template> templ, std::string slot);
+
     ~Page() = default;
+
     void write();
+
+    std::string get_out_path()
+    { return m_output_path; };
+
+    std::string get_frontmatter(std::string key)
+    {
+        if (m_frontmatter.find(key) != m_frontmatter.end())
+        {
+            return m_frontmatter[key];
+        }
+        else
+        {
+            std::cerr << "Warning: Frontmatter key " << key << " not found in " << m_path << std::endl;
+            return "";
+        }
+    };
 };
 
 #endif //BLUESKY_PAGE_H

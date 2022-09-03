@@ -7,6 +7,9 @@
 #include <fstream>
 #include <sstream>
 #include "sys/stat.h"
+#include "Config.h"
+
+extern Config *config;
 
 Constants::ImportType utils::identify_import(const std::string &raw, size_t idx)
 {
@@ -55,4 +58,23 @@ std::string utils::read_file(const std::string &path)
     buffer << file.rdbuf();
     file.close();
     return buffer.str();
+}
+
+std::string utils::get_final_path(const std::string &parent_path, const std::string &path)
+{
+    // parent path: ./build/blog.hml
+    // output_dir: ./build
+    // our path: ./build/blog/test.html
+    // strip the file name from the parent_path
+    std::string parent_dir = parent_path.substr(0, parent_path.find_last_of('/'));
+    // remove the output dir from the parent path
+    parent_dir = parent_dir.substr(config->m_output_dir.length());
+    // strip the output dir from the path
+    std::string final_path = path.substr(config->m_output_dir.length());
+    // strip the parent dir from the path
+    final_path = final_path.substr(parent_dir.length());
+    // strip leading /
+    if (final_path[0] == '/')
+        final_path = final_path.substr(1);
+    return final_path;
 }
