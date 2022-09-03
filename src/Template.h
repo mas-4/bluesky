@@ -17,9 +17,16 @@ private:
     std::string m_path;
     std::vector<std::string> m_blocks;
     void render();
+    std::string render_variables(
+            const std::string &block,
+            const std::unordered_map<std::string, std::string> &frontmatter);
 public:
     explicit Template(std::string path);
     ~Template() = default;
+    std::string render(
+            const std::unordered_map<std::string, std::string> &blocks,
+            const std::unordered_map<std::string, std::string> &frontmatter);
+
     std::string render(const std::unordered_map<std::string, std::string> &blocks);
 };
 

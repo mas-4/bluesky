@@ -26,7 +26,6 @@ private:
     std::string m_slot;
     std::string m_rendered;
     std::shared_ptr<Template> m_template;
-    std::unordered_map<std::string, std::string> m_frontmatter;
     bool is_templated();
     void render();
     void render_markdown_tags();

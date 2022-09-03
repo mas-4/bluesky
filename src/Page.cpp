@@ -58,14 +58,14 @@ void Page::render_markdown_tags()
         Template template_obj(templ_path);
         std::shared_ptr<Template> template_ptr = std::make_shared<Template>(template_obj);
         std::string slot = utils::get_attribute(m_raw.substr(idx), "slot");
-        ss << "<ul>";
+        ss << "<ul>\n";
         // iterate through files in directory
         for (auto &p: std::filesystem::directory_iterator(dir_path))
         {
             std::string file_path = p.path().string();
             if (p.path().extension() == ".md")
             {
-                ss << "<li><a href=\"" << p.path().filename() << "\">" << p.path().filename() << "</a></li>";
+                ss << "<li><a href=\"" << p.path().filename() << "\">" << p.path().filename() << "</a></li>\n";
                 m_children.emplace_back(Page(file_path, template_ptr, slot));
             }
         }
@@ -131,30 +131,18 @@ void Page::render_variables() {
             }
             else
             {
-                std::cerr << "Error: meta key " << key << " does not exist." << std::endl;
+                std::cerr << "Error: meta key " << key << " does not exist for page" << m_path << std::endl;
                 exit(1);
-            }
-        }
-        else if (ns == "frontmatter")
-        {
-            std::string key = m_rendered.substr(period + 1, var_end - period - 1);
-            if (m_frontmatter.contains(key))
-            {
-                ss << m_frontmatter[key];
-            }
-            else
-            {
-                std::cerr << "Warning: frontmatter key " << key << " does not exist." << std::endl;
             }
         }
         else
         {
-            std::cerr << "Warning: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1)
-                      << std::endl;
+            std::cerr << "Warning: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1) << "in page " << m_path << std::endl;
         }
         idx = last_idx;
     }
     ss << m_rendered.substr(last_idx);
+    m_rendered = ss.str();
 }
 
 // This function is recursive
@@ -168,12 +156,12 @@ void Page::render()
     }
     else if (m_path.ends_with(".md"))
     {
-        m_frontmatter = Markdown::parse_frontmatter(m_raw);
+        auto frontmatter = Markdown::parse_frontmatter(m_raw);
         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw.substr(frontmatter_end));
-        m_rendered = m_template->render(blocks);
-        render_variables();
+        m_rendered = m_template->render(blocks, frontmatter);
+        // do not render variables for frontmatter for a markdown file
         return;
     }
     else

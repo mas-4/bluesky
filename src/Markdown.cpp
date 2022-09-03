@@ -5,6 +5,7 @@
 #include "Markdown.h"
 #include <iostream>
 #include <sstream>
+#include <cstring>
 
 /*
  * MD4C: Markdown parser for C
@@ -172,5 +173,4 @@ std::unordered_map<std::string, std::string> Markdown::parse_frontmatter(const s
 size_t Markdown::get_frontmatter_end(const std::string &line)
 {
     return line.find("---", 4) + 4; // 4 is the length of "---\n"
-    return 0;
 }

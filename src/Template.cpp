@@ -7,6 +7,62 @@
 #include "Block.h"
 #include <sstream>
 #include <iostream>
+#include "Meta.h"
+
+#
+
+extern Meta *meta;
+
+std::string
+Template::render_variables(const std::string &block, const std::unordered_map<std::string, std::string> &frontmatter)
+{
+    // replace variables
+    size_t idx = 0;
+    auto ss = std::stringstream();
+    size_t last_idx = 0;
+    while ((idx = block.find(Constants::VARIABLE_OPENER, idx)) != std::string::npos)
+    {
+        ss << block.substr(last_idx, idx - last_idx);
+        size_t period = block.find('.', idx);
+        size_t var_end = block.find(Constants::VARIABLE_CLOSER, period);
+        last_idx = var_end + 1;
+        // check if namespace is meta
+        std::string ns = block.substr(idx + 2, period - idx - 2);
+        if (ns == "meta")
+        {
+            std::string key = block.substr(period + 1, var_end - period - 1);
+            if (meta->has(key))
+            {
+                ss << meta->get(key);
+            }
+            else
+            {
+                std::cerr << "Error: meta key " << key << " does not exist." << std::endl;
+                exit(1);
+            }
+        }
+        else if (ns == "frontmatter")
+        {
+            std::string key = block.substr(period + 1, var_end - period - 1);
+            if (frontmatter.contains(key))
+            {
+                ss << frontmatter.at(key);
+            }
+            else
+            {
+                std::cerr << "Warning: frontmatter key " << key << " does not exist." << std::endl;
+            }
+        }
+        else
+        {
+            std::cerr << "Warning: Unknown namespace in variable " << block.substr(idx, var_end - idx + 1)
+                      << std::endl;
+        }
+        idx = last_idx;
+    }
+    ss << block.substr(last_idx);
+    return ss.str();
+}
 
 void Template::render()
 {
@@ -26,20 +82,45 @@ void Template::render()
 }
 
 Template::Template(std::string path)
-: m_raw(utils::read_file(path)), m_path(std::move(path))
+        : m_raw(utils::read_file(path)), m_path(std::move(path))
 {
     render();
+}
+
+std::string Template::render(
+        const std::unordered_map<std::string, std::string> &blocks,
+        const std::unordered_map<std::string, std::string> &frontmatter
+)
+{
+    std::stringstream ss;
+    for (auto &block: m_blocks)
+    {
+        // markdown blocks
+        if (blocks.find(block) != blocks.end())
+        {
+            ss << blocks.at(block);
+        }
+        else
+        { // template blocks
+            ss << render_variables(block, frontmatter);
+        }
+    }
+    return ss.str();
 }
 
 std::string Template::render(const std::unordered_map<std::string, std::string> &blocks)
 {
     std::stringstream ss;
-    for (auto &block : m_blocks)
+    for (auto &block: m_blocks)
     {
         if (blocks.find(block) != blocks.end())
+        { // markdown blocks
             ss << blocks.at(block);
+        }
         else
+        { // template blocks
             ss << block;
+        }
     }
     return ss.str();
 }
