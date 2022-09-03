@@ -125,18 +125,32 @@ void Page::render_variables() {
         if (ns == "meta")
         {
             std::string key = m_rendered.substr(period + 1, var_end - period - 1);
-            ss << meta->get(key);
+            if (meta->has(key))
+            {
+                ss << meta->get(key);
+            }
+            else
+            {
+                std::cerr << "Error: meta key " << key << " does not exist." << std::endl;
+                exit(1);
+            }
         }
         else if (ns == "frontmatter")
         {
             std::string key = m_rendered.substr(period + 1, var_end - period - 1);
-            ss << m_frontmatter[key];
+            if (m_frontmatter.contains(key))
+            {
+                ss << m_frontmatter[key];
+            }
+            else
+            {
+                std::cerr << "Warning: frontmatter key " << key << " does not exist." << std::endl;
+            }
         }
         else
         {
-            std::cerr << "Error: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1)
+            std::cerr << "Warning: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1)
                       << std::endl;
-            exit(1);
         }
         idx = last_idx;
     }
@@ -154,9 +168,9 @@ void Page::render()
     }
     else if (m_path.ends_with(".md"))
     {
-        std::unordered_map<std::string, std::string> blocks;
         m_frontmatter = Markdown::parse_frontmatter(m_raw);
         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
+        std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw.substr(frontmatter_end));
         m_rendered = m_template->render(blocks);
         render_variables();

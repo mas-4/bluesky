@@ -149,14 +149,21 @@ std::string Markdown::parse(const std::string &raw)
     return output;
 }
 
-std::unordered_map<std::string, std::string> Markdown::parse_frontmatter(const std::string &line)
+std::unordered_map<std::string, std::string> Markdown::parse_frontmatter(const std::string &raw)
 {
     std::unordered_map<std::string, std::string> frontmatter;
-    std::stringstream ss(line);
-    std::string key;
-    std::string value;
-    while(std::getline(ss, key, ':')) {
-        std::getline(ss, value);
+    size_t start = raw.find("---\n") + 4;
+    size_t end = raw.find("---", start);
+    std::string frontmatter_raw = raw.substr(start, end - start);
+    std::istringstream iss(frontmatter_raw);
+    std::string line;
+    while (std::getline(iss, line)) {
+        size_t colon = line.find(':');
+        std::string key = line.substr(0, colon);
+        std::string value = line.substr(colon + 1);
+        // trim value
+        value.erase(0, value.find_first_not_of(' '));
+        value.erase(value.find_last_not_of(' ') + 1);
         frontmatter[key] = value;
     }
     return frontmatter;
@@ -164,6 +171,6 @@ std::unordered_map<std::string, std::string> Markdown::parse_frontmatter(const s
 
 size_t Markdown::get_frontmatter_end(const std::string &line)
 {
-    return line.find("---", 4) + 3;
+    return line.find("---", 4) + 4; // 4 is the length of "---\n"
     return 0;
 }
