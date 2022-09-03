@@ -1,2 +1,12 @@
-<bluesky-include name="_nav.html" />
-<bluesky-slot name="content"/>
+<html>
+<head>
+    <title>${frontmatter.title}</title>
+</head>
+<body>
+<bluesky-include name="_nav.html"/>
+<div style="margin: 0 auto">
+
+    <bluesky-slot name="content"/>
+</div>
+</body>
+</html>

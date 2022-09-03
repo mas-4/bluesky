@@ -28,6 +28,8 @@ namespace Constants
     static const size_t IMPORT_TAG_LENGTH = 7;
     static const std::string OPENER = "<bluesky-";
     static const std::string CLOSER = ">";
+    static const std::string VARIABLE_OPENER = "${";
+    static const std::string VARIABLE_CLOSER = "}";
     static const std::string IMPORT_TAGS[IMPORT_TAG_LENGTH] = {
             "<bluesky-include",
             "<bluesky-template",

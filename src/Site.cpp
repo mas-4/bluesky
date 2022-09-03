@@ -3,7 +3,10 @@
 //
 
 #include "Site.h"
+#include "Meta.h"
 #include <filesystem>
+
+extern Meta *meta;
 
 Site::Site(std::string input_dir)
         : m_input_dir(std::move(input_dir))
@@ -11,7 +14,12 @@ Site::Site(std::string input_dir)
     // recursively walk the input directory and build a list of pages
     for (auto &entry: std::filesystem::recursive_directory_iterator(m_input_dir))
     {
-        if (!entry.is_directory() && is_valid_page(entry.path().string()))
+        // check if filename is meta
+        if (!entry.is_directory() && entry.path().filename() == "meta")
+        {
+            meta = new Meta(entry.path().string());
+        }
+        else if (!entry.is_directory() && is_valid_page(entry.path().string()))
         {
             m_pages.emplace_back(Page(entry.path().string()));
         }

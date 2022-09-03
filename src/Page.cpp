@@ -14,8 +14,10 @@
 #include "Config.h"
 #include "Block.h"
 #include "Markdown.h"
+#include "Meta.h"
 
 extern Config *config;
+extern Meta *meta;
 
 Page::Page(std::string path)
         : m_path(std::move(path))
@@ -31,26 +33,16 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     std::string filepath = m_path.substr(config->m_input_dir.size());
     // replace .md with .html if it's a markdown file
     if (filepath.find(".md") != std::string::npos)
+    {
         filepath.replace(filepath.find(".md"), 3, ".html");
+    }
     m_output_path = config->m_output_dir + filepath;
     m_raw = utils::read_file(m_path);
     render();
 }
 
-// This function is recursive
-void Page::render()
+void Page::render_markdown_tags()
 {
-    if (!is_templated()) // the file is not templated, therefore we can directly render it
-    {
-        m_rendered = Block(m_raw, m_path).get_rendered();
-        return;
-    } else if (m_path.ends_with(".md"))
-    {
-        std::unordered_map<std::string, std::string> blocks;
-        blocks[m_slot] = Markdown::parse(m_raw);
-        m_rendered = m_template->render(blocks);
-        return;
-    }
     // first loop over for IT_MARKDOWN
     size_t idx = 0;
     size_t last_idx = 0;
@@ -81,10 +73,15 @@ void Page::render()
         idx = last_idx;
     }
     ss << m_raw.substr(last_idx);
-    std::string tmp = ss.str();
+    m_rendered = ss.str();
+}
+
+void Page::render_templating() {
+
     // the file is templated, therefore we have to switch on it
-    idx = 0;
+    size_t idx = 0;
     std::unordered_map<std::string, std::string> blocks;
+    std::string tmp = m_rendered;
     size_t tmpl_idx = tmp.find(Constants::OPENER);
     if (utils::identify_import(tmp, tmpl_idx) != Constants::IT_TEMPLATE)
     {
@@ -110,7 +107,67 @@ void Page::render()
         idx = block_end_end + 1;
     }
     m_rendered = m_template->render(blocks);
+}
 
+void Page::render_variables() {
+    // replace variables
+    size_t idx = 0;
+    auto ss = std::stringstream();
+    size_t last_idx = 0;
+    while ((idx = m_rendered.find(Constants::VARIABLE_OPENER, idx)) != std::string::npos)
+    {
+        ss << m_rendered.substr(last_idx, idx - last_idx);
+        size_t period = m_rendered.find('.', idx);
+        size_t var_end = m_rendered.find(Constants::VARIABLE_CLOSER, period);
+        last_idx = var_end + 1;
+        // check if namespace is meta
+        std::string ns = m_rendered.substr(idx + 2, period - idx - 2);
+        if (ns == "meta")
+        {
+            std::string key = m_rendered.substr(period + 1, var_end - period - 1);
+            ss << meta->get(key);
+        }
+        else if (ns == "frontmatter")
+        {
+            std::string key = m_rendered.substr(period + 1, var_end - period - 1);
+            ss << m_frontmatter[key];
+        }
+        else
+        {
+            std::cerr << "Error: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1)
+                      << std::endl;
+            exit(1);
+        }
+        idx = last_idx;
+    }
+    ss << m_rendered.substr(last_idx);
+}
+
+// This function is recursive
+void Page::render()
+{
+    if (!is_templated()) // the file is not templated, therefore we can directly render it
+    {
+        m_rendered = Block(m_raw, m_path).get_rendered();
+        render_variables();
+        return;
+    }
+    else if (m_path.ends_with(".md"))
+    {
+        std::unordered_map<std::string, std::string> blocks;
+        m_frontmatter = Markdown::parse_frontmatter(m_raw);
+        size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
+        blocks[m_slot] = Markdown::parse(m_raw.substr(frontmatter_end));
+        m_rendered = m_template->render(blocks);
+        render_variables();
+        return;
+    }
+    else
+    {
+        render_markdown_tags();
+        render_templating();
+        render_variables();
+    }
 }
 
 void Page::write()
@@ -136,7 +193,9 @@ void Page::write()
 bool Page::is_templated()
 {
     if (m_template != nullptr)
+    {
         return true;
+    }
     size_t idx = m_raw.find(Constants::OPENER, 0);
     if (idx == std::string::npos)
     {

@@ -4,6 +4,7 @@
 
 #include "Markdown.h"
 #include <iostream>
+#include <sstream>
 
 /*
  * MD4C: Markdown parser for C
@@ -146,4 +147,23 @@ std::string Markdown::parse(const std::string &raw)
     membuf_fini(&buf_in);
     membuf_fini(&buf_out);
     return output;
+}
+
+std::unordered_map<std::string, std::string> Markdown::parse_frontmatter(const std::string &line)
+{
+    std::unordered_map<std::string, std::string> frontmatter;
+    std::stringstream ss(line);
+    std::string key;
+    std::string value;
+    while(std::getline(ss, key, ':')) {
+        std::getline(ss, value);
+        frontmatter[key] = value;
+    }
+    return frontmatter;
+}
+
+size_t Markdown::get_frontmatter_end(const std::string &line)
+{
+    return line.find("---", 4) + 3;
+    return 0;
 }
