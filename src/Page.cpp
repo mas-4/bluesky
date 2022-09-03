@@ -170,18 +170,11 @@ void Page::render()
     }
     else if (m_path.ends_with(".md"))
     {
-        auto frontmatter = Markdown::parse_frontmatter(m_raw);
-        // copy frontmatter to m_frontmatter
-        for (auto &pair: frontmatter)
-        {
-            m_frontmatter[pair.first] = pair.second;
-            std::cout << pair.first << " " << pair.second << std::endl;
-        }
+        m_frontmatter = Markdown::parse_frontmatter(m_raw);
         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw.substr(frontmatter_end));
         m_rendered = m_template->render(blocks, m_frontmatter);
-        // do not render variables for frontmatter for a markdown file
         return;
     }
     else

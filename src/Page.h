@@ -56,6 +56,11 @@ public:
 
     std::string get_frontmatter(std::string key)
     {
+        // print all keys and values
+        std::cout << "Printing frontmatter for " << m_path << std::endl;
+        for (auto const& [key, val] : m_frontmatter) {
+            std::cout << key << ": " << val << std::endl;
+        }
         if (m_frontmatter.find(key) != m_frontmatter.end())
         {
             return m_frontmatter[key];
