@@ -42,9 +42,13 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     m_raw = utils::read_file(m_path);
     if (m_path.ends_with(".md"))
     {
-         m_frontmatter = std::move(Markdown::parse_frontmatter(m_raw));
-         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
-         m_raw = m_raw.substr(frontmatter_end);
+        auto tmp = Markdown::parse_frontmatter(m_raw);
+        for (auto &pair: tmp)
+        {
+            m_frontmatter[pair.first] = pair.second;
+        }
+        size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
+        m_raw = m_raw.substr(frontmatter_end);
     }
     std::cout << "Constructor Before rendering: " << get_frontmatter_size() << std::endl;
     render();
@@ -100,7 +104,8 @@ void Page::render_markdown_tags()
     m_rendered = ss.str();
 }
 
-void Page::render_templating() {
+void Page::render_templating()
+{
 
     // the file is templated, therefore we have to switch on it
     size_t idx = 0;
@@ -133,7 +138,8 @@ void Page::render_templating() {
     m_rendered = m_template->render(blocks);
 }
 
-void Page::render_variables() {
+void Page::render_variables()
+{
     // replace variables
     size_t idx = 0;
     auto ss = std::stringstream();
@@ -161,7 +167,8 @@ void Page::render_variables() {
         }
         else
         {
-            std::cerr << "Warning: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1) << "in page " << m_path << std::endl;
+            std::cerr << "Warning: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1)
+                      << "in page " << m_path << std::endl;
         }
         idx = last_idx;
     }
