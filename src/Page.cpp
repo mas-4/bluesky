@@ -22,7 +22,7 @@ Page::Page(std::string path)
         : m_path(std::move(path))
 {
     m_filename = std::filesystem::path(m_path).filename().string();
-    m_name = m_filename.substr(0, m_filename.find_last_of('.'));
+    m_name = std::move(m_filename.substr(0, m_filename.find_last_of('.')));
     m_output_path = config->m_output_dir + m_path.substr(config->m_input_dir.size());
 
     m_raw = utils::read_file(m_path);
@@ -81,9 +81,15 @@ void Page::render_markdown_tags()
             std::string file_path = p.path().string();
             if (p.path().extension() == ".md")
             {
-                m_children.emplace_back(Page(file_path, template_ptr, slot));
+                auto page = new Page(file_path, template_ptr, slot);
+                std::cout << "Before emplacing: " << page->get_frontmatter_size() << std::endl;
+                m_children.push_back(page);
+                std::cout << "After emplacing: " << m_children.back()->get_frontmatter_size() << std::endl;
+
             }
         }
+        std::cout << "After the loop " << m_children[0]->get_frontmatter_size() << std::endl;
+        std::cout << "Testing " << m_children[0]->get_out_path() << std::endl;
         /*
         std::sort(m_children.begin(), m_children.end(), [&sort_key](const Page &a, const Page &b) {
             return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
@@ -94,9 +100,9 @@ void Page::render_markdown_tags()
         {
             ss << "<ul>\n";
             // get relative path to m_output_path
-            std::cout << "Outside the object: " << child.get_frontmatter_size() << std::endl;
-            std::string rel_path = utils::get_final_path(m_output_path, child.get_out_path());
-            ss << "<li><a href=\"" << rel_path << "\">" << child.get_frontmatter(title) << "</a></li>\n";
+            std::cout << "Outside the object: " << child->get_frontmatter_size() << std::endl;
+            std::string rel_path = utils::get_final_path(m_output_path, child->get_out_path());
+            ss << "<li><a href=\"" << rel_path << "\">" << child->get_frontmatter(title) << "</a></li>\n";
             ss << "</ul>";
         }
         idx = last_idx;
@@ -217,8 +223,8 @@ void Page::write()
     file.close();
     for (auto &child: m_children)
     {
-        child.write();
-        std::cout << "At write time: " << child.get_frontmatter_size() << std::endl;
+        child->write();
+        std::cout << "At write time: " << child->get_frontmatter_size() << std::endl;
     }
 }
 
