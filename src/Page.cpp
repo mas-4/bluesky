@@ -43,17 +43,14 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     m_raw = utils::read_file(m_path);
     if (m_path.ends_with(".md"))
     {
-        auto tmp = Markdown::parse_frontmatter(m_raw);
-        for (auto &pair: tmp)
+        for (auto &pair: Markdown::parse_frontmatter(m_raw))
         {
             m_frontmatter[pair.first] = pair.second;
         }
         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
         m_raw = m_raw.substr(frontmatter_end);
     }
-    std::cout << "Constructor Before rendering: " << get_frontmatter_size() << std::endl;
     render();
-    std::cout << "Constructor after rendering: " << get_frontmatter_size() << std::endl;
 }
 
 void Page::render_markdown_tags()
@@ -82,29 +79,24 @@ void Page::render_markdown_tags()
             if (p.path().extension() == ".md")
             {
                 auto page = new Page(file_path, template_ptr, slot);
-                std::cout << "Before emplacing: " << page->get_frontmatter_size() << std::endl;
                 m_children.push_back(page);
-                std::cout << "After emplacing: " << m_children.back()->get_frontmatter_size() << std::endl;
 
             }
         }
-        std::cout << "After the loop " << m_children[0]->get_frontmatter_size() << std::endl;
-        std::cout << "Testing " << m_children[0]->get_out_path() << std::endl;
         /*
         std::sort(m_children.begin(), m_children.end(), [&sort_key](const Page &a, const Page &b) {
             return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
         });
          */
 
+        ss << "<ul>\n";
         for (auto &child: m_children)
         {
-            ss << "<ul>\n";
             // get relative path to m_output_path
-            std::cout << "Outside the object: " << child->get_frontmatter_size() << std::endl;
             std::string rel_path = utils::get_final_path(m_output_path, child->get_out_path());
             ss << "<li><a href=\"" << rel_path << "\">" << child->get_frontmatter(title) << "</a></li>\n";
-            ss << "</ul>";
         }
+        ss << "</ul>\n";
         idx = last_idx;
     }
     ss << m_raw.substr(last_idx);
@@ -196,7 +188,6 @@ void Page::render()
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw);
         m_rendered = m_template->render(blocks, m_frontmatter);
-        std::cout << "At render time: " << m_frontmatter.size() << std::endl;
     }
     else
     {
@@ -208,7 +199,6 @@ void Page::render()
 
 void Page::write()
 {
-    std::cout << "Writing from inside page object: " << get_frontmatter_size() << std::endl;
     // create the output directory if it doesn't exist
     std::string dir_path = m_output_path.substr(0, m_output_path.find_last_of('/'));
     std::filesystem::create_directories(dir_path);
@@ -224,7 +214,6 @@ void Page::write()
     for (auto &child: m_children)
     {
         child->write();
-        std::cout << "At write time: " << child->get_frontmatter_size() << std::endl;
     }
 }
 
