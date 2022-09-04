@@ -42,11 +42,13 @@ Config::Config(int argc, char *const argv[])
         std::cerr << "Error: input directory is not specified" << std::endl;
         std::cerr << "Usage: " << argv[0] << " -i <input directory>" << std::endl;
         exit(1);
-    } else if (access(m_input_dir.c_str(), F_OK) != 0)
+    }
+    else if (access(m_input_dir.c_str(), F_OK) != 0)
     {
         std::cerr << "Error: input directory does not exist" << std::endl;
         exit(1);
-    } else if (access(m_input_dir.c_str(), R_OK) != 0)
+    }
+    else if (access(m_input_dir.c_str(), R_OK) != 0)
     {
         std::cerr << "Error: input directory is not readable" << std::endl;
         exit(1);

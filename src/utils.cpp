@@ -14,8 +14,12 @@ extern Config *config;
 Constants::ImportType utils::identify_import(const std::string &raw, size_t idx)
 {
     for (int i = 0; i < Constants::IMPORT_TAG_LENGTH; i++)
+    {
         if (raw.substr(idx, Constants::IMPORT_TAGS[i].length()) == Constants::IMPORT_TAGS[i])
+        {
             return (Constants::ImportType) i;
+        }
+    }
     return Constants::IT_UNKNOWN;
 }
 
@@ -75,6 +79,8 @@ std::string utils::get_final_path(const std::string &parent_path, const std::str
     final_path = final_path.substr(parent_dir.length());
     // strip leading /
     if (final_path[0] == '/')
+    {
         final_path = final_path.substr(1);
+    }
     return final_path;
 }

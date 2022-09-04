@@ -16,12 +16,19 @@ private:
     std::string m_raw;
     std::string m_rendered;
     std::string m_path;
+
     void render();
+
 public:
     Block(std::string raw, std::string path);
+
     ~Block() = default;
-    std::string get_raw() { return m_raw; };
-    std::string get_rendered() { return m_rendered; };
+
+    std::string get_raw()
+    { return m_raw; };
+
+    std::string get_rendered()
+    { return m_rendered; };
 };
 
 #endif //BLUESKY_BLOCK_H

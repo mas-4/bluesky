@@ -41,7 +41,6 @@
 #include "md4c-html.h"
 
 
-
 /* Global options. */
 static unsigned parser_flags = 0;
 static unsigned renderer_flags = Constants::MD_FLAGS;
@@ -57,36 +56,41 @@ static unsigned renderer_flags = Constants::MD_FLAGS;
  * without the I/O.
  */
 
-struct membuffer {
-    char* data;
+struct membuffer
+{
+    char *data;
     size_t asize;
     size_t size;
 };
 
 static void
-membuf_init(struct membuffer* buf, MD_SIZE new_asize)
+membuf_init(struct membuffer *buf, MD_SIZE new_asize)
 {
     buf->size = 0;
     buf->asize = new_asize;
-    buf->data = (char*)malloc(buf->asize);
-    if(buf->data == nullptr) {
+    buf->data = (char *) malloc(buf->asize);
+    if (buf->data == nullptr)
+    {
         fprintf(stderr, "membuf_init: malloc() failed.\n");
         exit(1);
     }
 }
 
 static void
-membuf_fini(struct membuffer* buf)
+membuf_fini(struct membuffer *buf)
 {
-    if(buf->data)
+    if (buf->data)
+    {
         free(buf->data);
+    }
 }
 
 static void
-membuf_grow(struct membuffer* buf, size_t new_asize)
+membuf_grow(struct membuffer *buf, size_t new_asize)
 {
-    buf->data = (char*)realloc(buf->data, new_asize);
-    if(buf->data == nullptr) {
+    buf->data = (char *) realloc(buf->data, new_asize);
+    if (buf->data == nullptr)
+    {
         fprintf(stderr, "membuf_grow: realloc() failed.\n");
         exit(1);
     }
@@ -94,10 +98,12 @@ membuf_grow(struct membuffer* buf, size_t new_asize)
 }
 
 static void
-membuf_append(struct membuffer* buf, const char* data, MD_SIZE size)
+membuf_append(struct membuffer *buf, const char *data, MD_SIZE size)
 {
-    if(buf->asize < buf->size + size)
+    if (buf->asize < buf->size + size)
+    {
         membuf_grow(buf, buf->size + buf->size / 2 + size);
+    }
     memcpy(buf->data + buf->size, data, size);
     buf->size += size;
 }
@@ -108,9 +114,9 @@ membuf_append(struct membuffer* buf, const char* data, MD_SIZE size)
  **********************/
 
 static void
-process_output(const MD_CHAR* text, MD_SIZE size, void* userdata)
+process_output(const MD_CHAR *text, MD_SIZE size, void *userdata)
 {
-    membuf_append((struct membuffer*) userdata, text, size);
+    membuf_append((struct membuffer *) userdata, text, size);
 }
 
 
@@ -129,12 +135,13 @@ std::string Markdown::parse(const std::string &raw)
 
     /* Input size is good estimation of output size. Add some more reserve to
      * deal with the HTML header/footer and tags. */
-    membuf_init(&buf_out, buf_in.size + buf_in.size/8 + 64);
+    membuf_init(&buf_out, buf_in.size + buf_in.size / 8 + 64);
 
-    int ret = md_html(buf_in.data, buf_in.size, process_output, (void*) &buf_out,
-                  parser_flags, renderer_flags);
+    int ret = md_html(buf_in.data, buf_in.size, process_output, (void *) &buf_out,
+                      parser_flags, renderer_flags);
 
-    if(ret != 0) {
+    if (ret != 0)
+    {
         std::cerr << "Parsing failed.\n" << std::endl;
         exit(1);
     }
@@ -156,7 +163,8 @@ std::unordered_map<std::string, std::string> Markdown::parse_frontmatter(const s
     std::string frontmatter_raw = raw.substr(start, end - start);
     std::istringstream iss(frontmatter_raw);
     std::string line;
-    while (std::getline(iss, line)) {
+    while (std::getline(iss, line))
+    {
         size_t colon = line.find(':');
         std::string key = line.substr(0, colon);
         std::string value = line.substr(colon + 1);

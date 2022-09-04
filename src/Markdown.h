@@ -12,9 +12,11 @@
 namespace Markdown
 {
     std::string parse(const std::string &raw);
+
     std::unordered_map<std::string, std::string> parse_frontmatter(const std::string &raw);
+
     size_t get_frontmatter_end(const std::string &line);
-};
+}
 
 
 #endif //BLUESKY_MARKDOWN_H

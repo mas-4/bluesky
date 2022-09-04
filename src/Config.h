@@ -12,6 +12,7 @@ class Config
 {
 public:
     Config(int argc, char *const *argv);
+
     ~Config();
 
     std::string m_input_dir;

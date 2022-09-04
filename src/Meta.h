@@ -15,9 +15,11 @@ private:
     std::unordered_map<std::string, std::string> m_data;
 public:
     explicit Meta(const std::string &path);
+
     ~Meta() = default;
 
     std::string get(const std::string &key);
+
     bool has(const std::string &key);
 };
 
