@@ -15,7 +15,8 @@ Constants::ImportType utils::identify_import(const std::string &raw, size_t idx)
 {
     for (int i = 0; i < Constants::IMPORT_TAG_LENGTH; i++)
     {
-        if (raw.substr(idx, Constants::IMPORT_TAGS[i].length()) == Constants::IMPORT_TAGS[i])
+        std::string tag_str = raw.substr(idx, Constants::IMPORT_TAGS[i].length());
+        if (tag_str == Constants::IMPORT_TAGS[i])
         {
             return (Constants::ImportType) i;
         }

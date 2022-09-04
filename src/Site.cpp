@@ -4,9 +4,42 @@
 
 #include "Site.h"
 #include "Meta.h"
+#include "Config.h"
 #include <filesystem>
 
 extern Meta *meta;
+extern Config *config;
+
+
+bool is_valid_page(const std::string &path)
+{
+    if (path.find("meta") != std::string::npos)
+    {
+        return false;
+    }
+    if (path.find("_imports") != std::string::npos)
+    {
+        return false;
+    }
+    if (path.ends_with(".html") || path.ends_with(".css") || path.ends_with(".js"))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool is_copyable(const std::string &path)
+{
+    if (path.find("meta") == std::string::npos)
+    {
+        return false;
+    }
+    if (path.find("_imports") != std::string::npos)
+    {
+        return false;
+    }
+    return true;
+}
 
 Site::Site(std::string input_dir)
         : m_input_dir(std::move(input_dir))
@@ -21,6 +54,13 @@ Site::Site(std::string input_dir)
         {
             m_pages.emplace_back(Page(entry.path().string()));
         }
+        else if (!entry.is_directory() && is_copyable(entry.path().string()))
+        {
+            std::string output_path = config->m_output_dir + entry.path().string().substr(m_input_dir.size());
+            std::filesystem::create_directories(std::filesystem::path(output_path).parent_path());
+            // overwrite existing files
+            std::filesystem::copy_file(entry.path().string(), output_path, std::filesystem::copy_options::overwrite_existing);
+        }
     }
 }
 
@@ -30,21 +70,4 @@ void Site::write()
     {
         page.write();
     }
-}
-
-bool Site::is_valid_page(const std::string &path)
-{
-    if (path.find("meta") != std::string::npos)
-    {
-        return false;
-    }
-    if (path.find("_imports") != std::string::npos)
-    {
-        return false;
-    }
-    if (path.find(".md") != std::string::npos)
-    {
-        return false;
-    }
-    return true;
 }

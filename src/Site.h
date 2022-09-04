@@ -13,9 +13,6 @@ class Site
 private:
     std::vector<Page> m_pages;
     std::string m_input_dir;
-
-    static bool is_valid_page(const std::string &path);
-
 public:
     explicit Site(std::string input_dir);
 
