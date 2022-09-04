@@ -54,13 +54,21 @@ public:
     std::string get_out_path()
     { return m_output_path; };
 
+    void debug_frontmatter(bool inside) {
+        if (inside) {
+            std::cout << "Frontmatter for " << m_path << " from inside the house" << std::endl;
+        }
+        else {
+            std::cout << "Frontmatter for " << m_path << " from outside the house" << std::endl;
+        }
+        for (auto& [key, value] : m_frontmatter) {
+            std::cout << key << ": " << value << std::endl;
+        }
+    }
+
     std::string get_frontmatter(std::string key)
     {
         // print all keys and values
-        std::cout << "Printing frontmatter for " << m_path << std::endl;
-        for (auto const& [key, val] : m_frontmatter) {
-            std::cout << key << ": " << val << std::endl;
-        }
         if (m_frontmatter.find(key) != m_frontmatter.end())
         {
             return m_frontmatter[key];

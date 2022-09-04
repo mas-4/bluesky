@@ -26,6 +26,7 @@ Page::Page(std::string path)
 
     m_raw = utils::read_file(m_path);
     render();
+    debug_frontmatter(true);
 }
 
 Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
@@ -40,6 +41,7 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     m_output_path = config->m_output_dir + filepath;
     m_raw = utils::read_file(m_path);
     render();
+    std::cout << "From the constructor: " << m_path << std::endl;
 }
 
 void Page::render_markdown_tags()
@@ -68,6 +70,7 @@ void Page::render_markdown_tags()
             if (p.path().extension() == ".md")
             {
                 m_children.emplace_back(Page(file_path, template_ptr, slot));
+                m_children.back().debug_frontmatter(false);
             }
         }
         /*
@@ -170,11 +173,12 @@ void Page::render()
     }
     else if (m_path.ends_with(".md"))
     {
-        m_frontmatter = Markdown::parse_frontmatter(m_raw);
+        m_frontmatter = std::move(Markdown::parse_frontmatter(m_raw));
         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw.substr(frontmatter_end));
         m_rendered = m_template->render(blocks, m_frontmatter);
+        debug_frontmatter(true);
         return;
     }
     else
