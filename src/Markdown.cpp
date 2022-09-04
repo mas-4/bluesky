@@ -123,9 +123,7 @@ std::string Markdown::parse(const std::string &raw)
 
     /* Read the input file into a buffer. */
     // convert raw to a char *
-    char *raw_char = new char[raw.size() + 1];
-    strcpy(raw_char, raw.c_str());
-    buf_in.data = raw_char;
+    strcpy(buf_in.data, raw.c_str());
     buf_in.size = raw.size() + 1;
     buf_in.asize = raw.size() + 1;
 

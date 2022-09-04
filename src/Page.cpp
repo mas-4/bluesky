@@ -11,8 +11,8 @@
 #include "Page.h"
 #include "Config.h"
 #include "Block.h"
-#include "Markdown.h"
 #include "Meta.h"
+#include "Markdown.h"
 
 extern Config *config;
 extern Meta *meta;
@@ -25,8 +25,8 @@ Page::Page(std::string path)
     m_output_path = config->m_output_dir + m_path.substr(config->m_input_dir.size());
 
     m_raw = utils::read_file(m_path);
+
     render();
-    debug_frontmatter(true);
 }
 
 Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
@@ -40,8 +40,15 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     }
     m_output_path = config->m_output_dir + filepath;
     m_raw = utils::read_file(m_path);
+    if (m_path.ends_with(".md"))
+    {
+         m_frontmatter = std::move(Markdown::parse_frontmatter(m_raw));
+         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
+         m_raw = m_raw.substr(frontmatter_end);
+    }
+    std::cout << "Constructor Before rendering: " << get_frontmatter_size() << std::endl;
     render();
-    std::cout << "From the constructor: " << m_path << std::endl;
+    std::cout << "Constructor after rendering: " << get_frontmatter_size() << std::endl;
 }
 
 void Page::render_markdown_tags()
@@ -70,7 +77,6 @@ void Page::render_markdown_tags()
             if (p.path().extension() == ".md")
             {
                 m_children.emplace_back(Page(file_path, template_ptr, slot));
-                m_children.back().debug_frontmatter(false);
             }
         }
         /*
@@ -83,6 +89,7 @@ void Page::render_markdown_tags()
         {
             ss << "<ul>\n";
             // get relative path to m_output_path
+            std::cout << "Outside the object: " << child.get_frontmatter_size() << std::endl;
             std::string rel_path = utils::get_final_path(m_output_path, child.get_out_path());
             ss << "<li><a href=\"" << rel_path << "\">" << child.get_frontmatter(title) << "</a></li>\n";
             ss << "</ul>";
@@ -169,17 +176,13 @@ void Page::render()
     {
         m_rendered = Block(m_raw, m_path).get_rendered();
         render_variables();
-        return;
     }
     else if (m_path.ends_with(".md"))
     {
-        m_frontmatter = std::move(Markdown::parse_frontmatter(m_raw));
-        size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
         std::unordered_map<std::string, std::string> blocks;
-        blocks[m_slot] = Markdown::parse(m_raw.substr(frontmatter_end));
+        blocks[m_slot] = Markdown::parse(m_raw);
         m_rendered = m_template->render(blocks, m_frontmatter);
-        debug_frontmatter(true);
-        return;
+        std::cout << "At render time: " << m_frontmatter.size() << std::endl;
     }
     else
     {
@@ -191,6 +194,7 @@ void Page::render()
 
 void Page::write()
 {
+    std::cout << "Writing from inside page object: " << get_frontmatter_size() << std::endl;
     // create the output directory if it doesn't exist
     std::string dir_path = m_output_path.substr(0, m_output_path.find_last_of('/'));
     std::filesystem::create_directories(dir_path);
@@ -206,6 +210,7 @@ void Page::write()
     for (auto &child: m_children)
     {
         child.write();
+        std::cout << "At write time: " << child.get_frontmatter_size() << std::endl;
     }
 }
 
