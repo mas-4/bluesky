@@ -30,8 +30,9 @@ So, this is for you, Sky Blue.
 
 # TODO
 
-- [ ] Change constants class to a namespace
-- [ ] Templates
-- [ ] Markdown
+- [X] Change constants class to a namespace
+- [X] Templates
+- [X] Markdown
 - [ ] Tests
-- [ ] Pipeline
+- [X] Pipeline
+- [ ] Development server mode
