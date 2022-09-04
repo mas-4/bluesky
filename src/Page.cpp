@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <unordered_map>
 #include <utility>
+#include <sstream>
 
 #include "Page.h"
 #include "Config.h"
