@@ -30,11 +30,15 @@ bool is_valid_page(const std::string &path)
 
 bool is_copyable(const std::string &path)
 {
-    if (path.find("meta") == std::string::npos)
+    if (path.find("meta") != std::string::npos)
     {
         return false;
     }
     if (path.find("_imports") != std::string::npos)
+    {
+        return false;
+    }
+    if (path.ends_with(".md"))
     {
         return false;
     }
