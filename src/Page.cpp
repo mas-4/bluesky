@@ -90,6 +90,7 @@ void Page::render_markdown_tags()
         std::string slot = utils::get_attribute(m_raw.substr(idx), "slot");
         std::string sort_key = utils::get_attribute(m_raw.substr(idx), "sort");
         std::string title = utils::get_attribute(m_raw.substr(idx), "title");
+        std::string order = utils::get_attribute(m_raw.substr(idx), "order");
         // iterate through files in directory
         for (auto &p: std::filesystem::directory_iterator(dir_path))
         {
@@ -100,11 +101,25 @@ void Page::render_markdown_tags()
 
             }
         }
-        std::sort(m_children.begin(), m_children.end(), [&sort_key](Page &a, Page &b)
+        if (order == "ascending" || order == "asc")
         {
-            return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
-        });
-
+            std::sort(m_children.begin(), m_children.end(), [&sort_key](Page &a, Page &b)
+            {
+                return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
+            });
+        }
+        else if (order == "descending" || order == "desc")
+        {
+            std::sort(m_children.begin(), m_children.end(), [&sort_key](Page &a, Page &b)
+            {
+                return a.get_frontmatter(sort_key) > b.get_frontmatter(sort_key);
+            });
+        }
+        else
+        {
+            std::cerr << "Warning: Invalid order attribute for markdown tag '" << order << "' in " << m_path
+                      << std::endl;
+        }
         ss << "<ul>\n";
         for (auto &child: m_children)
         {
