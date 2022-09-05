@@ -150,6 +150,16 @@ std::string Markdown::parse(const std::string &raw)
     buf_out.data[buf_out.size] = '\0';
     std::string output(buf_out.data);
 
+    // strip question mark paragraph
+    // no idea why it's there
+    std::string bad_chars = "<p>�</p>";
+    size_t bad_output = output.find(bad_chars);
+    if (bad_output != std::string::npos)
+    {
+        output.replace(bad_output, bad_chars.size(), "");
+    }
+
+
     membuf_fini(&buf_in);
     membuf_fini(&buf_out);
     return output;
