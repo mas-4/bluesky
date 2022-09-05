@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.7...3.24)
 project(bluesky)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -15,9 +15,10 @@ set(CXX_SRC main.cpp
         src/Template.cpp
         src/Meta.cpp
         src/Markdown.cpp
+        src/Logger.cpp
         ${MD4C}/entity.c
         ${MD4C}/md4c.c
-        ${MD4C}/md4c-html.c src/Logger.cpp src/Logger.h)
+        ${MD4C}/md4c-html.c)
 
 
 add_executable(bluesky ${CXX_SRC})
