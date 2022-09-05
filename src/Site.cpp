@@ -93,7 +93,7 @@ void Site::write()
         page.write();
     }
 
-    Logger::get_instance()->log("Wrote " + std::to_string(m_pages.size()));
+    Logger::get_instance()->log("Wrote " + std::to_string(m_pages.size()) + " top level pages");
     Logger::get_instance()->log("Writing .htaccess");
     std::cout << "Writing .htaccess" << std::endl;
     // write out htaccess file

@@ -125,7 +125,7 @@ std::string Markdown::parse(const std::string &raw)
     struct membuffer buf_in = {0};
     struct membuffer buf_out = {0};
 
-    membuf_init(&buf_in, 32 * 1024);
+    membuf_init(&buf_in, raw.size() + 1);
 
     /* Read the input file into a buffer. */
     // convert raw to a char *

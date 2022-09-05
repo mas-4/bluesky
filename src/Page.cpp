@@ -211,8 +211,12 @@ void Page::render()
     }
     else
     {
+        Logger::get_instance()->log("Page is templated: " + m_path);
+        Logger::get_instance()->log("Rendering markdown tags...");
         render_markdown_tags();
+        Logger::get_instance()->log("Rendering templating...");
         render_templating();
+        Logger::get_instance()->log("Rendering variables...");
         render_variables();
     }
 }
@@ -235,6 +239,10 @@ void Page::write()
     for (auto &child: m_children)
     {
         child.write();
+    }
+    if (m_children.size() > 0)
+    {
+        Logger::get_instance()->log("Wrote " + std::to_string(m_children.size()) + " children of " + m_path);
     }
 }
 
