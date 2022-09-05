@@ -41,9 +41,9 @@ std::string utils::get_attribute(const std::string &line, const std::string &att
     size_t start = line.find(attribute);
     if (start == std::string::npos)
     {
-        std::cerr << "Error: failed to find attribute " << attribute << " in "
+        std::cerr << "Warning: failed to find attribute " << attribute << " in "
                   << line << std::endl;
-        exit(1);
+        return "";
     }
     start += attribute.length();
     size_t start_quote = line.find('"', start);

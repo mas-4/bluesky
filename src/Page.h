@@ -21,7 +21,7 @@ class Page
 {
 private:
     std::string m_path;
-    std::vector<Page *> m_children;
+    std::vector<Page> m_children;
     std::string m_output_path;
     std::string m_filename;
     std::string m_name;

@@ -41,7 +41,7 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     }
     // strip file extension
     filepath = filepath.substr(0, filepath.find_last_of('.'));
-    m_output_path = config->m_output_dir + filepath;
+    m_output_path = config->m_output_dir + filepath + ".html";
     m_raw = utils::read_file(m_path);
     if (m_path.ends_with(".md"))
     {
@@ -65,6 +65,7 @@ Page::Page(const Page &page)
     m_template = nullptr;
     m_slot = page.m_slot;
     m_children = page.m_children;
+    m_frontmatter = page.m_frontmatter;
 }
 
 // loop over and render the markdown tags to create children
@@ -93,21 +94,20 @@ void Page::render_markdown_tags()
             std::string file_path = p.path().string();
             if (p.path().extension() == ".md")
             {
-                auto page = new Page(file_path, template_ptr, slot);
-                m_children.push_back(page);
+                m_children.emplace_back(Page(file_path, template_ptr, slot));
 
             }
         }
-        std::sort(m_children.begin(), m_children.end(), [&sort_key](Page* &a, Page* &b) {
-            return a->get_frontmatter(sort_key) < b->get_frontmatter(sort_key);
+        std::sort(m_children.begin(), m_children.end(), [&sort_key](Page &a, Page &b) {
+            return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
         });
 
         ss << "<ul>\n";
         for (auto &child: m_children)
         {
             // get relative path to m_output_path
-            std::string rel_path = utils::get_final_path(m_output_path, child->get_out_path());
-            ss << "<li><a href=\"" << rel_path << "\">" << child->get_frontmatter(title) << "</a></li>\n";
+            std::string rel_path = utils::get_final_path(m_output_path, child.get_out_path());
+            ss << "<li><a href=\"" << rel_path << "\">" << child.get_frontmatter(title) << "</a></li>\n";
         }
         ss << "</ul>\n";
         idx = last_idx;
@@ -127,10 +127,10 @@ void Page::render_templating()
     size_t tmpl_idx = tmp.find(Constants::OPENER);
     if (utils::identify_import(tmp, tmpl_idx) != Constants::IT_TEMPLATE)
     {
-        std::cerr << "Error: <bluesky-template /> must be the first bluesky tag in a file" << m_path << "."
+        std::cerr << "Warning: <bluesky-template /> must be the first bluesky tag in a file" << m_path << "."
                   << std::endl;
         std::cerr << tmp << std::endl;
-        exit(1);
+        return;
     }
     // instantiate template shared_ptr
     std::string templ_path_raw = utils::get_attribute(tmp.substr(tmpl_idx), "template");
@@ -175,8 +175,7 @@ void Page::render_variables()
             }
             else
             {
-                std::cerr << "Error: meta key " << key << " does not exist for page" << m_path << std::endl;
-                exit(1);
+                std::cerr << "Warning: meta key " << key << " does not exist for page" << m_path << std::endl;
             }
         }
         else
@@ -229,7 +228,7 @@ void Page::write()
     file.close();
     for (auto &child: m_children)
     {
-        child->write();
+        child.write();
     }
 }
 
@@ -248,7 +247,4 @@ bool Page::is_templated()
     return utils::identify_import(m_raw, idx) == Constants::IT_TEMPLATE;
 }
 
-Page::~Page()
-{
-
-}
+Page::~Page() = default;

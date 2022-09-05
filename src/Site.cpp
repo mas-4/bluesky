@@ -6,10 +6,18 @@
 #include "Meta.h"
 #include "Config.h"
 #include <filesystem>
+#include <fstream>
 
 extern Meta *meta;
 extern Config *config;
 
+// static constant multiline string
+const std::string htaccess = R"(
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^([^\.]+)$ $1.html [NC, L]
+)";
 
 bool is_valid_page(const std::string &path)
 {
@@ -74,4 +82,8 @@ void Site::write()
     {
         page.write();
     }
+    // write out htaccess file
+    std::ofstream file(config->m_output_dir + "/.htaccess");
+    file << htaccess;
+    file.close();
 }

@@ -37,8 +37,7 @@ Template::render_variables(const std::string &block, const std::unordered_map<st
             }
             else
             {
-                std::cerr << "Error: meta key " << key << " does not exist." << std::endl;
-                exit(1);
+                std::cerr << "Warning: meta key " << key << " does not exist." << std::endl;
             }
         }
         else if (ns == "frontmatter")
