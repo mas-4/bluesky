@@ -54,6 +54,9 @@ public:
     std::string get_out_path()
     { return m_output_path; };
 
+    std::string get_path()
+    { return m_path; };
+
     std::string get_frontmatter(const std::string &key) const
     {
         // print all keys and values

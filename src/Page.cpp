@@ -14,6 +14,7 @@
 #include "Block.h"
 #include "Meta.h"
 #include "Markdown.h"
+#include "Logger.h"
 
 extern Config *config;
 extern Meta *meta;
@@ -22,11 +23,11 @@ Page::Page(std::string path)
         : m_path(std::move(path))
 {
     m_filename = std::filesystem::path(m_path).filename().string();
-    m_name = std::move(m_filename.substr(0, m_filename.find_last_of('.')));
+    m_name = std::move(m_filename);
     m_output_path = config->get_output_dir() + m_path.substr(config->get_input_dir().size());
 
     m_raw = utils::read_file(m_path);
-
+    Logger::get_instance()->log("Rendering flat page: " + m_path);
     render();
 }
 
@@ -52,6 +53,7 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
         size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
         m_raw = m_raw.substr(frontmatter_end);
     }
+    Logger::get_instance()->log("Rendering templated page: " + m_path);
     render();
 }
 
@@ -98,7 +100,8 @@ void Page::render_markdown_tags()
 
             }
         }
-        std::sort(m_children.begin(), m_children.end(), [&sort_key](Page &a, Page &b) {
+        std::sort(m_children.begin(), m_children.end(), [&sort_key](Page &a, Page &b)
+        {
             return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
         });
 
@@ -194,11 +197,14 @@ void Page::render()
 {
     if (!is_templated()) // the file is not templated, therefore we can directly render it
     {
+        Logger::get_instance()->log("Page is not templated: " + m_path);
         m_rendered = Block(m_raw, m_path).get_rendered();
+        Logger::get_instance()->log("Rendering variables: " + m_path);
         render_variables();
     }
     else if (m_path.ends_with(".md"))
     {
+        Logger::get_instance()->log("Page is markdown: " + m_path);
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw);
         m_rendered = m_template->render(blocks, m_frontmatter);
