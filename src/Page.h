@@ -21,7 +21,7 @@ class Page
 {
 private:
     std::string m_path;
-    std::vector<Page*> m_children;
+    std::vector<Page *> m_children;
     std::string m_output_path;
     std::string m_filename;
     std::string m_name;
@@ -47,22 +47,19 @@ public:
     Page(const Page &page); // copy constructor
     Page(std::string path, std::shared_ptr<Template> templ, std::string slot);
 
-    ~Page() = default;
+    ~Page();
 
     void write();
 
     std::string get_out_path()
     { return m_output_path; };
 
-    size_t get_frontmatter_size()
-    { return m_frontmatter.size(); };
-
-    std::string get_frontmatter(std::string key)
+    std::string get_frontmatter(const std::string &key) const
     {
         // print all keys and values
         if (m_frontmatter.find(key) != m_frontmatter.end())
         {
-            return m_frontmatter[key];
+            return m_frontmatter.at(key);
         }
         else
         {

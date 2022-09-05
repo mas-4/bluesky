@@ -39,6 +39,8 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     {
         filepath.replace(filepath.find(".md"), 3, ".html");
     }
+    // strip file extension
+    filepath = filepath.substr(0, filepath.find_last_of('.'));
     m_output_path = config->m_output_dir + filepath;
     m_raw = utils::read_file(m_path);
     if (m_path.ends_with(".md"))
@@ -53,6 +55,19 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     render();
 }
 
+// copy constructor
+Page::Page(const Page &page)
+{
+    m_path = page.m_path;
+    m_output_path = page.m_output_path;
+    m_raw = page.m_raw;
+    m_rendered = page.m_rendered;
+    m_template = nullptr;
+    m_slot = page.m_slot;
+    m_children = page.m_children;
+}
+
+// loop over and render the markdown tags to create children
 void Page::render_markdown_tags()
 {
     // first loop over for IT_MARKDOWN
@@ -83,11 +98,9 @@ void Page::render_markdown_tags()
 
             }
         }
-        /*
-        std::sort(m_children.begin(), m_children.end(), [&sort_key](const Page &a, const Page &b) {
-            return a.get_frontmatter(sort_key) < b.get_frontmatter(sort_key);
+        std::sort(m_children.begin(), m_children.end(), [&sort_key](Page* &a, Page* &b) {
+            return a->get_frontmatter(sort_key) < b->get_frontmatter(sort_key);
         });
-         */
 
         ss << "<ul>\n";
         for (auto &child: m_children)
@@ -103,6 +116,7 @@ void Page::render_markdown_tags()
     m_rendered = ss.str();
 }
 
+// render the file into the template
 void Page::render_templating()
 {
 
@@ -137,6 +151,7 @@ void Page::render_templating()
     m_rendered = m_template->render(blocks);
 }
 
+// render all variables of the form ${namespace.var}
 void Page::render_variables()
 {
     // replace variables
@@ -175,7 +190,7 @@ void Page::render_variables()
     m_rendered = ss.str();
 }
 
-// This function is recursive
+// Master render call, recursive
 void Page::render()
 {
     if (!is_templated()) // the file is not templated, therefore we can directly render it
@@ -197,6 +212,7 @@ void Page::render()
     }
 }
 
+// write out the file and its children
 void Page::write()
 {
     // create the output directory if it doesn't exist
@@ -217,6 +233,7 @@ void Page::write()
     }
 }
 
+// check if the page is templated
 bool Page::is_templated()
 {
     if (m_template != nullptr)
@@ -231,13 +248,7 @@ bool Page::is_templated()
     return utils::identify_import(m_raw, idx) == Constants::IT_TEMPLATE;
 }
 
-Page::Page(const Page &page)
+Page::~Page()
 {
-    m_path = page.m_path;
-    m_output_path = page.m_output_path;
-    m_raw = page.m_raw;
-    m_rendered = page.m_rendered;
-    m_template = nullptr;
-    m_slot = page.m_slot;
-    m_children = page.m_children;
+
 }
