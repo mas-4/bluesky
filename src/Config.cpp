@@ -55,5 +55,30 @@ Config::Config(int argc, char *const argv[])
     }
 }
 
+const std::string &Config::get_input_dir() const
+{
+    return m_input_dir;
+}
+
+const std::string &Config::get_output_dir() const
+{
+    return m_output_dir;
+}
+
+const std::string &Config::get_serve_ip() const
+{
+    return m_serve_ip;
+}
+
+bool Config::is_verbose() const
+{
+    return m_verbose;
+}
+
+bool Config::is_force() const
+{
+    return m_force;
+}
+
 Config::~Config()
 = default;

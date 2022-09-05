@@ -68,7 +68,7 @@ Site::Site(std::string input_dir)
         }
         else if (!entry.is_directory() && is_copyable(entry.path().string()))
         {
-            std::string output_path = config->m_output_dir + entry.path().string().substr(m_input_dir.size());
+            std::string output_path = config->get_output_dir() + entry.path().string().substr(m_input_dir.size());
             std::filesystem::create_directories(std::filesystem::path(output_path).parent_path());
             // overwrite existing files
             std::filesystem::copy_file(entry.path().string(), output_path, std::filesystem::copy_options::overwrite_existing);
@@ -83,7 +83,7 @@ void Site::write()
         page.write();
     }
     // write out htaccess file
-    std::ofstream file(config->m_output_dir + "/.htaccess");
+    std::ofstream file(config->get_output_dir() + "/.htaccess");
     file << htaccess;
     file.close();
 }

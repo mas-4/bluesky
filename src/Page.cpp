@@ -23,7 +23,7 @@ Page::Page(std::string path)
 {
     m_filename = std::filesystem::path(m_path).filename().string();
     m_name = std::move(m_filename.substr(0, m_filename.find_last_of('.')));
-    m_output_path = config->m_output_dir + m_path.substr(config->m_input_dir.size());
+    m_output_path = config->get_output_dir() + m_path.substr(config->get_input_dir().size());
 
     m_raw = utils::read_file(m_path);
 
@@ -33,7 +33,7 @@ Page::Page(std::string path)
 Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
         : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot))
 {
-    std::string filepath = m_path.substr(config->m_input_dir.size());
+    std::string filepath = m_path.substr(config->get_input_dir().size());
     // replace .md with .html if it's a markdown file
     if (filepath.find(".md") != std::string::npos)
     {
@@ -41,7 +41,7 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     }
     // strip file extension
     filepath = filepath.substr(0, filepath.find_last_of('.'));
-    m_output_path = config->m_output_dir + filepath + ".html";
+    m_output_path = config->get_output_dir() + filepath + ".html";
     m_raw = utils::read_file(m_path);
     if (m_path.ends_with(".md"))
     {
