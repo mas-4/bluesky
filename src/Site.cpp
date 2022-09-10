@@ -75,11 +75,15 @@ Site::Site(std::string input_dir)
         else if (!entry.is_directory() && is_copyable(entry.path().string()))
         {
             Logger::log("Copying " + entry.path().string());
-            std::string output_path = config->get_output_dir() + entry.path().string().substr(m_input_dir.size());
+            std::string final_path = entry.path().string().substr(m_input_dir.size());
+            std::string output_path = config->get_output_dir() + final_path;
             std::filesystem::create_directories(std::filesystem::path(output_path).parent_path());
             // overwrite existing files
-            std::filesystem::copy_file(entry.path().string(), output_path,
+            std::filesystem::copy_file(entry.path().string(),
+                                       output_path,
                                        std::filesystem::copy_options::overwrite_existing);
+            // read the file into m_file_map
+            m_files_map[final_path] = utils::read_file(entry.path().string());
         }
     }
     Logger::log("Added " + std::to_string(m_pages.size()) + " pages");
@@ -115,4 +119,9 @@ void Site::write()
 bool Site::has_page(const std::string &path) const
 {
     return m_pages_map.find(path) != m_pages_map.end();
+}
+
+bool Site::has_file(const std::string &path) const
+{
+    return m_files_map.find(path) != m_files_map.end();
 }

@@ -6,6 +6,7 @@
 #include "Constants.h"
 #include "Logger.h"
 #include <arpa/inet.h>
+#include <unistd.h>
 
 Server::Server(const Site &site, const std::string &ip_addr)
         : m_site(site)
@@ -31,9 +32,14 @@ Server::Server(const Site &site, const std::string &ip_addr)
     }
     // set socket reuseaddr
     int opt = 1;
-    if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+    if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)))
     {
-        perror("setsockopt");
+        perror("setsockopt REUSEPORT");
+        throw std::runtime_error("setsockopt failed");
+    }
+    if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
+    {
+        perror("setsockopt REUSEADDR");
         throw std::runtime_error("setsockopt failed");
     }
     if (bind(m_server_fd, (struct sockaddr *) &m_addr, sizeof(m_addr)) < 0)
@@ -43,10 +49,20 @@ Server::Server(const Site &site, const std::string &ip_addr)
     }
 }
 
+std::string get_mime_type(const std::string &path)
+{
+    std::string extension = path.substr(path.find_last_of('.'));
+    if (Constants::MIME_TYPES.find(extension) == Constants::MIME_TYPES.end())
+    {
+        return "application/octet-stream";
+    }
+    return Constants::MIME_TYPES.at(extension);
+}
+
 std::string Server::construct_response(const std::string &request)
 {
     size_t after_get = request.find("GET ") + 4;
-    std::string path = request.substr(after_get, request.find(" ", after_get) - after_get);
+    std::string path = request.substr(after_get, request.find(' ', after_get) - after_get);
     Logger::log("Request: " + path);
     if (path == "/")    // root is index.html
     {
@@ -56,20 +72,24 @@ std::string Server::construct_response(const std::string &request)
     {
         path += ".html";
     }
+    std::string response_content;
 
     if (m_site.has_page(path))
     {
-        std::string response_content = m_site.get_page(path)->get_rendered();
-        return "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " +
-               std::to_string(response_content.length()) + "\n\n" + response_content;
+        response_content = m_site.get_page(path)->get_rendered();
+    }
+    else if (m_site.has_file(path))
+    {
+        response_content = m_site.get_file(path);
     }
     else
     {
-        std::string response_content = "404 Not Found";
+        response_content = "404 Not Found";
         return "HTTP/1.1 404 Not Found\nContent-Type: text/html\nContent-Length: " +
                std::to_string(response_content.length()) + "\n\n" + response_content;
     }
-
+    return "HTTP/1.1 200 OK\nContent-Type: " + get_mime_type(path)  + "\nContent-Length: " +
+           std::to_string(response_content.length()) + "\n\n" + response_content;
 }
 
 void Server::run()

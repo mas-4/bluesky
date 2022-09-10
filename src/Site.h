@@ -13,7 +13,8 @@ class Site
 private:
     std::vector<Page> m_pages;
     std::string m_input_dir;
-    std::unordered_map<std::string, Page*> m_pages_map;
+    std::unordered_map<std::string, Page *> m_pages_map;
+    std::unordered_map<std::string, std::string> m_files_map;
 public:
     explicit Site(std::string input_dir);
 
@@ -21,10 +22,17 @@ public:
 
     void write();
 
-    bool has_page(const std::string& path) const;
+    [[nodiscard]] bool has_page(const std::string &path) const;
+    [[nodiscard]] bool has_file(const std::string &path) const;
 
-    Page* get_page(const std::string& path) {
+    Page *get_page(const std::string &path)
+    {
         return m_pages_map[path];
+    };
+
+    std::string get_file(const std::string &path)
+    {
+        return m_files_map[path];
     };
 };
 
