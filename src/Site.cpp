@@ -89,7 +89,7 @@ Site::Site(std::string input_dir)
         Logger::log("Added page " + page.get_final_path());
         for (auto &child : page.get_children())
         {
-            m_pages_map[child.get_final_path()] = &page;
+            m_pages_map[child.get_final_path()] = &child;
             Logger::log("Added child " + child.get_final_path());
         }
     }
