@@ -45,7 +45,8 @@ Server::Server(const Site &site, const std::string &ip_addr)
 
 std::string Server::construct_response(const std::string &request)
 {
-    std::string path = request.substr(0, request.find(' '));
+    size_t after_get = request.find("GET ") + 4;
+    std::string path = request.substr(after_get, request.find(" ", after_get) - after_get);
     Logger::log("Request: " + path);
     if (path == "/")    // root is index.html
     {
