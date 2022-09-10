@@ -87,9 +87,9 @@ void Page::render_markdown_tags()
             std::string file_path = p.path().string();
             if (p.path().extension() == ".md")
             {
-                auto p = Page(file_path, template_ptr, slot);
-                p.render();
-                m_children.emplace_back(p);
+                auto pg = Page(file_path, template_ptr, slot);
+                pg.render();
+                m_children.emplace_back(pg);
 
             }
         }
