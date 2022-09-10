@@ -21,6 +21,8 @@ public:
 
     void write();
 
+    bool has_page(const std::string& path) const;
+
     Page* get_page(const std::string& path) {
         return m_pages_map[path];
     };

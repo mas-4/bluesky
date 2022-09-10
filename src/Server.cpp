@@ -4,10 +4,11 @@
 
 #include "Server.h"
 #include "Constants.h"
+#include "Logger.h"
 #include <arpa/inet.h>
 
-Server::Server(const Site &site, const std::string& ip_addr)
-: m_site(site)
+Server::Server(const Site &site, const std::string &ip_addr)
+        : m_site(site)
 {
     if (ip_addr.empty())
     {
@@ -28,10 +29,46 @@ Server::Server(const Site &site, const std::string& ip_addr)
     {
         throw std::runtime_error("socket failed");
     }
-    if (bind(m_server_fd, (struct sockaddr *)&m_addr, sizeof(m_addr)) < 0)
+    // set socket reuseaddr
+    int opt = 1;
+    if (setsockopt(m_server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
     {
+        perror("setsockopt");
+        throw std::runtime_error("setsockopt failed");
+    }
+    if (bind(m_server_fd, (struct sockaddr *) &m_addr, sizeof(m_addr)) < 0)
+    {
+        perror("bind failed");
         throw std::runtime_error("bind failed");
     }
+}
+
+std::string Server::construct_response(const std::string &request)
+{
+    std::string path = request.substr(0, request.find(' '));
+    Logger::log("Request: " + path);
+    if (path == "/")    // root is index.html
+    {
+        path = "/index.html";
+    }
+    if (path.find('.') == std::string::npos)    // no extension for html because of htaccess
+    {
+        path += ".html";
+    }
+
+    if (m_site.has_page(path))
+    {
+        std::string response_content = m_site.get_page(path)->get_rendered();
+        return "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " +
+               std::to_string(response_content.length()) + "\n\n" + response_content;
+    }
+    else
+    {
+        std::string response_content = "404 Not Found";
+        return "HTTP/1.1 404 Not Found\nContent-Type: text/html\nContent-Length: " +
+               std::to_string(response_content.length()) + "\n\n" + response_content;
+    }
+
 }
 
 void Server::run()
@@ -43,21 +80,22 @@ void Server::run()
     while (true)
     {
         int new_socket;
-        sockaddr_in address;
+        sockaddr_in address{};
         socklen_t addrlen = sizeof(address);
-        if ((new_socket = accept(m_server_fd, (struct sockaddr *)&address, &addrlen)) < 0)
+        if ((new_socket = accept(m_server_fd, (struct sockaddr *) &address, &addrlen)) < 0)
         {
             throw std::runtime_error("accept failed");
         }
-        char buffer[1024] = { 0 };
+        char buffer[1024] = {0};
         read(new_socket, buffer, 1024);
         std::string request = buffer;
         // get the path from the request
-        std::string path = request.substr(request.find(' ') + 1);
-        path = path.substr(0, path.find(' '));
-        std::string response_content = m_site.get_page(path)->get_rendered();
-        std::string response = "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: " + std::to_string(response_content.length()) + "\n\n" + response_content;
+        std::string response = construct_response(request);
         send(new_socket, response.c_str(), response.length(), 0);
         close(new_socket);
     }
+}
+
+Server::~Server()
+{
 }

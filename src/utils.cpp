@@ -74,13 +74,13 @@ bool is_directory(const std::string &path)
 
 std::string utils::get_final_path(const std::string &parent_path, const std::string &path)
 {
-    // Example Data
     // parent path: ./build/blog.hml
     // output_dir: ./build
     // our path: ./build/blog/test.html
+    // strip the file name from the parent_path
+    // check if parent_path is a filename or a directory
 
-    // check if parent_path is a filename or a directory, strip the filename if it is not
-    std::string parent_dir = is_directory(parent_path) ? parent_path : parent_path.substr(0, parent_path.find_last_of('/'));
+    std::string parent_dir = parent_path.substr(0, parent_path.find_last_of('/'));
     // remove the output dir from the parent path
     parent_dir = parent_dir.substr(config->get_output_dir().length());
     // strip the output dir from the path

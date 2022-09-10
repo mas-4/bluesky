@@ -9,23 +9,22 @@ extern Config *config;
 int main(int argc, char *argv[])
 {
     config = new Config(argc, argv);
-    Logger *logger = Logger::get_instance();
-    logger->log("Starting BlueSky...");
-    logger->log("Input directory: " + config->get_input_dir());
-    logger->log("Output directory: " + config->get_output_dir());
-    logger->log("Verbose: " + std::to_string(config->is_verbose()));
-    logger->log("Serve: " + std::to_string(config->is_serve()));
-    logger->log("Building site...");
+    Logger::log("Starting BlueSky...");
+    Logger::log("Input directory: " + config->get_input_dir());
+    Logger::log("Output directory: " + config->get_output_dir());
+    Logger::log("Verbose: " + std::to_string(config->is_verbose()));
+    Logger::log("Serve: " + std::to_string(config->is_serve()));
+    Logger::log("Building site...");
     Site site(config->get_input_dir());
     if (config->is_serve())
     {
-        logger->log("Serving site...");
+        Logger::log("Serving site...");
         Server server(site, config->get_serve_ip());
         server.run();
     }
     else
     {
-        logger->log("Writing site...");
+        Logger::log("Writing site...");
         site.write();
     }
     delete config;

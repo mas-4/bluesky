@@ -15,6 +15,7 @@
 #include "Block.h"
 #include "Template.h"
 #include "utils.h"
+#include "Logger.h"
 
 
 class Page
@@ -24,7 +25,6 @@ private:
     std::string m_path;
     std::string m_output_path;
     std::string m_final_path;
-    std::string m_name;
     std::string m_raw;
     std::string m_slot;
     std::string m_rendered;
@@ -68,7 +68,7 @@ public:
         }
         else
         {
-            std::cerr << "Warning: Frontmatter key " << key << " not found in " << m_path << std::endl;
+            Logger::warn("Warning: frontmatter key '" + key + "' not found in page '" + m_path + "'");
             return "";
         }
     };

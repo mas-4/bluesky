@@ -21,8 +21,10 @@ private:
 public:
 
     Server(const Site &site, const std::string& ip_addr);
-    ~Server() = default;
+    ~Server();
     void run();
+
+    std::string construct_response(const std::string &path);
 };
 
 
