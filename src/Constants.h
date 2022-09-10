@@ -41,6 +41,7 @@ namespace Constants
             "```",
     };
     static const std::string TEMPLATE_END = "</bluesky-template>";
+    static const size_t DEFAULT_PORT = 8080;
 
 
 }

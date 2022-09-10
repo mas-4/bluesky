@@ -1,27 +1,32 @@
 #include <iostream>
 #include "src/Config.h"
 #include "src/Site.h"
+#include "src/Logger.h"
+#include "src/Server.h"
 
 extern Config *config;
 
 int main(int argc, char *argv[])
 {
     config = new Config(argc, argv);
-    if (config->is_verbose())
-    {
-        std::cout << "Input directory: " << config->get_input_dir() << std::endl;
-        std::cout << "Output directory: " << config->get_output_dir() << std::endl;
-        std::cout << "Serve IP: " << config->get_serve_ip() << std::endl;
-    }
-    if (config->is_verbose())
-    {
-        std::cout << "Building site..." << std::endl;
-    }
+    Logger *logger = Logger::get_instance();
+    logger->log("Starting BlueSky...");
+    logger->log("Input directory: " + config->get_input_dir());
+    logger->log("Output directory: " + config->get_output_dir());
+    logger->log("Verbose: " + std::to_string(config->is_verbose()));
+    logger->log("Serve: " + std::to_string(config->is_serve()));
+    logger->log("Building site...");
     Site site(config->get_input_dir());
-    if (config->is_verbose())
+    if (config->is_serve())
     {
-        std::cout << "Writing site..." << std::endl;
+        logger->log("Serving site...");
+        Server server(site, config->get_serve_ip());
+        server.run();
     }
-    site.write();
+    else
+    {
+        logger->log("Writing site...");
+        site.write();
+    }
     delete config;
 }

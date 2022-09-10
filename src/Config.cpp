@@ -26,9 +26,6 @@ Config::Config(int argc, char *const argv[])
             case 'v':
                 m_verbose = true;
                 break;
-            case 'f':
-                m_force = true;
-                break;
             case 'h':
                 m_serve_ip = std::string(optarg);
                 break;
@@ -75,9 +72,9 @@ bool Config::is_verbose() const
     return m_verbose;
 }
 
-bool Config::is_force() const
+bool Config::is_serve() const
 {
-    return m_force;
+    return !m_serve_ip.empty();
 }
 
 Config::~Config()

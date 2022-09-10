@@ -15,7 +15,6 @@ private:
     std::string m_output_dir;
     std::string m_serve_ip;
     bool m_verbose = false;
-    bool m_force = false;
 public:
     Config(int argc, char *const *argv);
 
@@ -29,7 +28,7 @@ public:
 
         [[nodiscard]] bool is_verbose() const;
 
-        [[nodiscard]] bool is_force() const;
+        [[nodiscard]] bool is_serve() const;
 };
 
 

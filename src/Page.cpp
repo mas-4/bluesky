@@ -25,6 +25,7 @@ Page::Page(std::string path)
     m_filename = std::filesystem::path(m_path).filename().string();
     m_name = std::move(m_filename);
     m_output_path = config->get_output_dir() + m_path.substr(config->get_input_dir().size());
+    m_final_path = utils::get_final_path(config->get_output_dir(), m_output_path);
 
     m_raw = utils::read_file(m_path);
     Logger::get_instance()->log("Rendering flat page: " + m_path);
@@ -43,6 +44,7 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     // strip file extension
     filepath = filepath.substr(0, filepath.find_last_of('.'));
     m_output_path = config->get_output_dir() + filepath + ".html";
+    m_final_path = utils::get_final_path(config->get_output_dir(), m_output_path);
     m_raw = utils::read_file(m_path);
     if (m_path.ends_with(".md"))
     {

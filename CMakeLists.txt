@@ -18,7 +18,7 @@ set(CXX_SRC main.cpp
         src/Logger.cpp
         ${MD4C}/entity.c
         ${MD4C}/md4c.c
-        ${MD4C}/md4c-html.c)
+        ${MD4C}/md4c-html.c src/Server.cpp src/Server.h)
 
 
 add_executable(bluesky ${CXX_SRC})

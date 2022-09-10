@@ -20,14 +20,16 @@
 class Page
 {
 private:
-    std::string m_path;
-    std::vector<Page> m_children;
-    std::string m_output_path;
     std::string m_filename;
+    std::string m_path;
+    std::string m_output_path;
+    std::string m_final_path;
     std::string m_name;
     std::string m_raw;
     std::string m_slot;
     std::string m_rendered;
+
+    std::vector<Page> m_children;
     std::shared_ptr<Template> m_template;
     std::unordered_map<std::string, std::string> m_frontmatter;
 
@@ -70,6 +72,16 @@ public:
             return "";
         }
     };
+
+    std::vector<Page> get_children()
+    { return m_children; };
+
+    std::string get_final_path() const
+    { return m_final_path; };
+
+    std::string get_rendered() const
+    { return m_rendered; };
+
 };
 
 #endif //BLUESKY_PAGE_H
