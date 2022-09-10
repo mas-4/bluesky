@@ -62,6 +62,7 @@ Page::Page(const Page &page)
 {
     m_path = page.m_path;
     m_output_path = page.m_output_path;
+    m_final_path = page.m_final_path;
     m_raw = page.m_raw;
     m_rendered = page.m_rendered;
     m_template = nullptr;
