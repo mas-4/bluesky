@@ -69,35 +69,61 @@ Site::Site(std::string input_dir)
     {
         if (!entry.is_directory() && is_valid_page(entry.path().string()))
         {
-            Logger::get_instance()->log("Adding page " + entry.path().string());
-            m_pages.emplace_back(Page(entry.path().string()));
+            Logger::log("Adding page " + entry.path().string());
+            auto p = Page(entry.path().string());
+            p.render();
+            m_pages.emplace_back(p);
         }
         else if (!entry.is_directory() && is_copyable(entry.path().string()))
         {
-            Logger::get_instance()->log("Copying " + entry.path().string());
-            std::string output_path = config->get_output_dir() + entry.path().string().substr(m_input_dir.size());
+            Logger::log("Copying " + entry.path().string());
+            std::string final_path = entry.path().string().substr(m_input_dir.size());
+            std::string output_path = config->get_output_dir() + final_path;
             std::filesystem::create_directories(std::filesystem::path(output_path).parent_path());
             // overwrite existing files
-            std::filesystem::copy_file(entry.path().string(), output_path,
+            std::filesystem::copy_file(entry.path().string(),
+                                       output_path,
                                        std::filesystem::copy_options::overwrite_existing);
+            // read the file into m_file_map
+            m_files_map[final_path] = utils::read_file(entry.path().string());
         }
     }
-    Logger::get_instance()->log("Added " + std::to_string(m_pages.size()) + " pages");
+    Logger::log("Added " + std::to_string(m_pages.size()) + " pages");
+    for (auto &page: m_pages)
+    {
+        m_pages_map[page.get_final_path()] = &page;
+        Logger::log("Added page " + page.get_final_path());
+        for (auto &child : page.get_children())
+        {
+            m_pages_map[child.get_final_path()] = &child;
+            Logger::log("Added child " + child.get_final_path());
+        }
+    }
 }
 
 void Site::write()
 {
     for (auto &page: m_pages)
     {
-        Logger::get_instance()->log("Writing page " + page.get_path());
+        Logger::log("Writing page " + page.get_path());
         page.write();
     }
 
-    Logger::get_instance()->log("Wrote " + std::to_string(m_pages.size()) + " top level pages");
-    Logger::get_instance()->log("Writing .htaccess");
+    Logger::log("Wrote " + std::to_string(m_pages.size()) + " top level pages");
+    Logger::log("Writing .htaccess");
     std::cout << "Writing .htaccess" << std::endl;
     // write out htaccess file
     std::ofstream file(config->get_output_dir() + "/.htaccess");
     file << htaccess;
     file.close();
+}
+
+bool Site::has_page(const std::string &path) const
+{
+    return m_pages_map.find(path) != m_pages_map.end();
+}
+
+bool Site::has_file(const std::string &path) const
+{
+    return m_files_map.find(path) != m_files_map.end();
 }

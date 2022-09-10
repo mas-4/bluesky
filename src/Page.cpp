@@ -14,25 +14,19 @@
 #include "Block.h"
 #include "Meta.h"
 #include "Markdown.h"
-#include "Logger.h"
 
 extern Config *config;
 extern Meta *meta;
 
 Page::Page(std::string path)
-        : m_path(std::move(path))
+        : m_path(std::move(path)), m_lastmodified(0)
 {
-    m_filename = std::filesystem::path(m_path).filename().string();
-    m_name = std::move(m_filename);
     m_output_path = config->get_output_dir() + m_path.substr(config->get_input_dir().size());
-
-    m_raw = utils::read_file(m_path);
-    Logger::get_instance()->log("Rendering flat page: " + m_path);
-    render();
+    m_final_path = m_output_path.substr(config->get_output_dir().size());
 }
 
 Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
-        : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot))
+        : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot)), m_lastmodified(0)
 {
     std::string filepath = m_path.substr(config->get_input_dir().size());
     // replace .md with .html if it's a markdown file
@@ -41,20 +35,11 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
         filepath.replace(filepath.find(".md"), 3, ".html");
     }
     // strip file extension
-    filepath = filepath.substr(0, filepath.find_last_of('.'));
-    m_output_path = config->get_output_dir() + filepath + ".html";
-    m_raw = utils::read_file(m_path);
-    if (m_path.ends_with(".md"))
-    {
-        for (auto &pair: Markdown::parse_frontmatter(m_raw))
-        {
-            m_frontmatter[pair.first] = pair.second;
-        }
-        size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
-        m_raw = m_raw.substr(frontmatter_end);
-    }
-    Logger::get_instance()->log("Rendering templated page: " + m_path);
-    render();
+    filepath = filepath.substr(0, filepath.find_last_of('.')) + ".html";
+    m_output_path = config->get_output_dir() + filepath;
+    m_final_path = filepath;
+
+    Logger::log("Rendering templated page: " + m_path);
 }
 
 // copy constructor
@@ -62,13 +47,18 @@ Page::Page(const Page &page)
 {
     m_path = page.m_path;
     m_output_path = page.m_output_path;
+    m_final_path = page.m_final_path;
     m_raw = page.m_raw;
     m_rendered = page.m_rendered;
     m_template = nullptr;
     m_slot = page.m_slot;
     m_children = page.m_children;
     m_frontmatter = page.m_frontmatter;
+    m_lastmodified = page.m_lastmodified;
 }
+
+// Destructor
+Page::~Page() = default;
 
 // loop over and render the markdown tags to create children
 void Page::render_markdown_tags()
@@ -97,7 +87,9 @@ void Page::render_markdown_tags()
             std::string file_path = p.path().string();
             if (p.path().extension() == ".md")
             {
-                m_children.emplace_back(Page(file_path, template_ptr, slot));
+                auto p = Page(file_path, template_ptr, slot);
+                p.render();
+                m_children.emplace_back(p);
 
             }
         }
@@ -124,7 +116,9 @@ void Page::render_markdown_tags()
         for (auto &child: m_children)
         {
             // get relative path to m_output_path
-            std::string rel_path = utils::get_final_path(m_output_path, child.get_out_path());
+            std::string rel_path = child.get_final_path();
+            // strip .html
+            rel_path = rel_path.substr(0, rel_path.find_last_of('.'));
             ss << "<li><a href=\"" << rel_path << "\">" << child.get_frontmatter(title) << "</a></li>\n";
         }
         ss << "</ul>\n";
@@ -210,28 +204,40 @@ void Page::render_variables()
 // Master render call, recursive
 void Page::render()
 {
+    m_raw = utils::read_file(m_path);
+    m_lastmodified = utils::get_last_modified(m_path);
+    if (m_path.ends_with(".md"))
+    {
+        for (auto &pair: Markdown::parse_frontmatter(m_raw))
+        {
+            m_frontmatter[pair.first] = pair.second;
+        }
+        size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
+        m_raw = m_raw.substr(frontmatter_end);
+    }
+
     if (!is_templated()) // the file is not templated, therefore we can directly render it
     {
-        Logger::get_instance()->log("Page is not templated: " + m_path);
+        Logger::log("Page is not templated: " + m_path);
         m_rendered = Block(m_raw, m_path).get_rendered();
-        Logger::get_instance()->log("Rendering variables: " + m_path);
+        Logger::log("Rendering variables: " + m_path);
         render_variables();
     }
     else if (m_path.ends_with(".md"))
     {
-        Logger::get_instance()->log("Page is markdown: " + m_path);
+        Logger::log("Page is markdown: " + m_path);
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw);
         m_rendered = m_template->render(blocks, m_frontmatter);
     }
     else
     {
-        Logger::get_instance()->log("Page is templated: " + m_path);
-        Logger::get_instance()->log("Rendering markdown tags...");
+        Logger::log("Page is templated: " + m_path);
+        Logger::log("Rendering markdown tags...");
         render_markdown_tags();
-        Logger::get_instance()->log("Rendering templating...");
+        Logger::log("Rendering templating...");
         render_templating();
-        Logger::get_instance()->log("Rendering variables...");
+        Logger::log("Rendering variables...");
         render_variables();
     }
 }
@@ -255,9 +261,9 @@ void Page::write()
     {
         child.write();
     }
-    if (m_children.size() > 0)
+    if (!m_children.empty())
     {
-        Logger::get_instance()->log("Wrote " + std::to_string(m_children.size()) + " children of " + m_path);
+        Logger::log("Wrote " + std::to_string(m_children.size()) + " children of " + m_path);
     }
 }
 
@@ -276,4 +282,16 @@ bool Page::is_templated()
     return utils::identify_import(m_raw, idx) == Constants::IT_TEMPLATE;
 }
 
-Page::~Page() = default;
+std::string Page::get_frontmatter(const std::string &key) const
+{
+    // print all keys and values
+    if (m_frontmatter.find(key) != m_frontmatter.end())
+    {
+        return m_frontmatter.at(key);
+    }
+    else
+    {
+        Logger::warn("Warning: frontmatter key '" + key + "' not found in page '" + m_path + "'");
+        return "";
+    }
+}

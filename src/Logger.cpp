@@ -4,6 +4,7 @@
 
 #include "Logger.h"
 #include "Config.h"
+
 extern Config *config;
 
 void Logger::log(const std::string &msg)
@@ -12,5 +13,9 @@ void Logger::log(const std::string &msg)
     {
         std::cout << msg << std::endl;
     }
+}
 
+void Logger::warn(const std::string &msg)
+{
+    std::cout << msg << std::endl;
 }

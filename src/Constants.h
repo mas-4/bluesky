@@ -6,6 +6,7 @@
 #define BLUESKY_CONSTANTS_H
 
 #include <string>
+#include <unordered_map>
 #include "md4c.h"
 
 namespace Constants
@@ -41,7 +42,51 @@ namespace Constants
             "```",
     };
     static const std::string TEMPLATE_END = "</bluesky-template>";
-
+    static const size_t DEFAULT_PORT = 8080;
+    static const std::unordered_map<std::string, std::string> MIME_TYPES = {
+            {".html",  "text/html"},
+            {".css",   "text/css"},
+            {".js",    "application/javascript"},
+            {".png",   "image/png"},
+            {".jpg",   "image/jpeg"},
+            {".jpeg",  "image/jpeg"},
+            {".gif",   "image/gif"},
+            {".svg",   "image/svg+xml"},
+            {".ico",   "image/x-icon"},
+            {".json",  "application/json"},
+            {".pdf",   "application/pdf"},
+            {".zip",   "application/zip"},
+            {".gz",    "application/gzip"},
+            {".txt",   "text/plain"},
+            {".md",    "text/markdown"},
+            {".xml",   "text/xml"},
+            {".xhtml", "application/xhtml+xml"},
+            {".wasm",  "application/wasm"},
+            {".webp",  "image/webp"},
+            {".webm",  "video/webm"},
+            {".mp4",   "video/mp4"},
+            {".mp3",   "audio/mpeg"},
+            {".ogg",   "audio/ogg"},
+            {".wav",   "audio/wav"},
+            {".flac",  "audio/flac"},
+            {".aac",   "audio/aac"},
+            {".m4a",   "audio/mp4"},
+            {".m4v",   "video/mp4"},
+            {".mov",   "video/quicktime"},
+            {".avi",   "video/x-msvideo"},
+            {".wmv",   "video/x-ms-wmv"},
+            {".flv",   "video/x-flv"},
+            {".mkv",   "video/x-matroska"},
+            {".ts",    "video/mp2t"},
+            {".3gp",   "video/3gpp"},
+            {".3g2",   "video/3gpp2"},
+            {".7z",    "application/x-7z-compressed"},
+            {".rar",   "application/x-rar-compressed"},
+            {".tar",   "application/x-tar"},
+            {".bz2",   "application/x-bzip2"},
+            {".doc",   "application/msword"},
+            {".docx",  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+    };
 
 }
 

@@ -8,13 +8,9 @@
 #include <string>
 
 class Logger{
-    Logger() = default;
 public:
-    static Logger * get_instance(){
-        static Logger instance;
-        return &instance;
-    }
-    void log(const std::string &msg);
+    static void log(const std::string &msg);
+    static void warn(const std::string &msg);
 };
 
 

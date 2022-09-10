@@ -65,12 +65,21 @@ std::string utils::read_file(const std::string &path)
     return buffer.str();
 }
 
+bool is_directory(const std::string &path)
+{
+    struct stat st{};
+    stat(path.c_str(), &st);
+    return S_ISDIR(st.st_mode);
+}
+
 std::string utils::get_final_path(const std::string &parent_path, const std::string &path)
 {
     // parent path: ./build/blog.hml
     // output_dir: ./build
     // our path: ./build/blog/test.html
     // strip the file name from the parent_path
+    // check if parent_path is a filename or a directory
+
     std::string parent_dir = parent_path.substr(0, parent_path.find_last_of('/'));
     // remove the output dir from the parent path
     parent_dir = parent_dir.substr(config->get_output_dir().length());
