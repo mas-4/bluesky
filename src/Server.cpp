@@ -76,7 +76,12 @@ std::string Server::construct_response(const std::string &request)
 
     if (m_site.has_page(path))
     {
-        response_content = m_site.get_page(path)->get_rendered();
+        auto page = m_site.get_page(path);
+        if (utils::get_last_modified(page->get_path()) > page->get_last_modified())
+        {
+            page->render();
+        }
+        response_content = page->get_rendered();
     }
     else if (m_site.has_file(path))
     {

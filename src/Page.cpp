@@ -19,19 +19,14 @@ extern Config *config;
 extern Meta *meta;
 
 Page::Page(std::string path)
-        : m_path(std::move(path))
+        : m_path(std::move(path)), m_lastmodified(0)
 {
-    m_filename = std::filesystem::path(m_path).filename().string();
     m_output_path = config->get_output_dir() + m_path.substr(config->get_input_dir().size());
     m_final_path = m_output_path.substr(config->get_output_dir().size());
-
-    m_raw = utils::read_file(m_path);
-    Logger::log("Rendering flat page: " + m_path);
-    render();
 }
 
 Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
-        : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot))
+        : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot)), m_lastmodified(0)
 {
     std::string filepath = m_path.substr(config->get_input_dir().size());
     // replace .md with .html if it's a markdown file
@@ -43,18 +38,8 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     filepath = filepath.substr(0, filepath.find_last_of('.')) + ".html";
     m_output_path = config->get_output_dir() + filepath;
     m_final_path = filepath;
-    m_raw = utils::read_file(m_path);
-    if (m_path.ends_with(".md"))
-    {
-        for (auto &pair: Markdown::parse_frontmatter(m_raw))
-        {
-            m_frontmatter[pair.first] = pair.second;
-        }
-        size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
-        m_raw = m_raw.substr(frontmatter_end);
-    }
+
     Logger::log("Rendering templated page: " + m_path);
-    render();
 }
 
 // copy constructor
@@ -69,7 +54,11 @@ Page::Page(const Page &page)
     m_slot = page.m_slot;
     m_children = page.m_children;
     m_frontmatter = page.m_frontmatter;
+    m_lastmodified = page.m_lastmodified;
 }
+
+// Destructor
+Page::~Page() = default;
 
 // loop over and render the markdown tags to create children
 void Page::render_markdown_tags()
@@ -98,7 +87,9 @@ void Page::render_markdown_tags()
             std::string file_path = p.path().string();
             if (p.path().extension() == ".md")
             {
-                m_children.emplace_back(Page(file_path, template_ptr, slot));
+                auto p = Page(file_path, template_ptr, slot);
+                p.render();
+                m_children.emplace_back(p);
 
             }
         }
@@ -213,6 +204,18 @@ void Page::render_variables()
 // Master render call, recursive
 void Page::render()
 {
+    m_raw = utils::read_file(m_path);
+    m_lastmodified = utils::get_last_modified(m_path);
+    if (m_path.ends_with(".md"))
+    {
+        for (auto &pair: Markdown::parse_frontmatter(m_raw))
+        {
+            m_frontmatter[pair.first] = pair.second;
+        }
+        size_t frontmatter_end = Markdown::get_frontmatter_end(m_raw);
+        m_raw = m_raw.substr(frontmatter_end);
+    }
+
     if (!is_templated()) // the file is not templated, therefore we can directly render it
     {
         Logger::log("Page is not templated: " + m_path);
@@ -279,4 +282,16 @@ bool Page::is_templated()
     return utils::identify_import(m_raw, idx) == Constants::IT_TEMPLATE;
 }
 
-Page::~Page() = default;
+std::string Page::get_frontmatter(const std::string &key) const
+{
+    // print all keys and values
+    if (m_frontmatter.find(key) != m_frontmatter.end())
+    {
+        return m_frontmatter.at(key);
+    }
+    else
+    {
+        Logger::warn("Warning: frontmatter key '" + key + "' not found in page '" + m_path + "'");
+        return "";
+    }
+}

@@ -70,7 +70,9 @@ Site::Site(std::string input_dir)
         if (!entry.is_directory() && is_valid_page(entry.path().string()))
         {
             Logger::log("Adding page " + entry.path().string());
-            m_pages.emplace_back(Page(entry.path().string()));
+            auto p = Page(entry.path().string());
+            p.render();
+            m_pages.emplace_back(p);
         }
         else if (!entry.is_directory() && is_copyable(entry.path().string()))
         {
