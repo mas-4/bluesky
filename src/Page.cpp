@@ -40,9 +40,9 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
         filepath.replace(filepath.find(".md"), 3, ".html");
     }
     // strip file extension
-    filepath = filepath.substr(0, filepath.find_last_of('.'));
-    m_output_path = config->get_output_dir() + filepath + ".html";
-    m_final_path = m_output_path.substr(config->get_output_dir().size());
+    filepath = filepath.substr(0, filepath.find_last_of('.')) + ".html";
+    m_output_path = config->get_output_dir() + filepath;
+    m_final_path = filepath;
     m_raw = utils::read_file(m_path);
     if (m_path.ends_with(".md"))
     {
@@ -125,7 +125,9 @@ void Page::render_markdown_tags()
         for (auto &child: m_children)
         {
             // get relative path to m_output_path
-            std::string rel_path = utils::get_final_path(m_output_path, child.get_out_path());
+            std::string rel_path = child.get_final_path();
+            // strip .html
+            rel_path = rel_path.substr(0, rel_path.find_last_of('.'));
             ss << "<li><a href=\"" << rel_path << "\">" << child.get_frontmatter(title) << "</a></li>\n";
         }
         ss << "</ul>\n";
