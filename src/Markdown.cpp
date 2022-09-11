@@ -152,8 +152,13 @@ std::string Markdown::parse(const std::string &raw)
 
     // strip question mark paragraph
     // no idea why it's there
-    std::string bad_chars = "<p>�</p>";
+    std::string bad_chars = "�";
     size_t bad_output;
+    while ((bad_output = output.find(bad_chars)) != std::string::npos) {
+        output.replace(bad_output, bad_chars.size(), "");
+    }
+    bad_chars = "<p></p>";
+    bad_output;
     while ((bad_output = output.find(bad_chars)) != std::string::npos) {
         output.replace(bad_output, bad_chars.size(), "");
     }
