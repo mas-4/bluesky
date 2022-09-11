@@ -3,6 +3,7 @@
 //
 
 #include "utils.h"
+#include "Logger.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -41,8 +42,7 @@ std::string utils::get_attribute(const std::string &line, const std::string &att
     size_t start = line.find(attribute);
     if (start == std::string::npos)
     {
-        std::cerr << "Warning: failed to find attribute " << attribute << " in "
-                  << line << std::endl;
+        Logger::warn("Warning: failed to find attribute " + attribute + " in " + line);
         return "";
     }
     start += attribute.length();
@@ -56,8 +56,8 @@ std::string utils::read_file(const std::string &path)
     std::ifstream file(path);
     if (!file.is_open())
     {
-        std::cerr << "Error: failed to open file " << path << std::endl;
-        exit(1);
+        Logger::warn("Error: failed to open file " + path);
+        return "";
     }
     std::stringstream buffer;
     buffer << file.rdbuf();
