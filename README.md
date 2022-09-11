@@ -16,15 +16,11 @@ implemented these basic features:
 The closest thing to doing just that I've found is [Sergey](https://sergey.cool/)
 which is a nice little project written as a single file of JavaScript.
 
-That's cool and all, and I use it, but its JavaScript (🤮😜). No, but 
-seriously speaking, I've had a simple PR open for Sergey for 2 years now (https://github.com/trys/sergey/pull/52)
-with no response from Trys so I'm not interested in relying on it anymore, 
-and I figure something like this is simple enough that I can learn more C++ 
-by writing it.
+That's cool and all, and I use it, but its JavaScript (🤮😜).
 
-Also, I feel like I'm already making some advancements, like arbitrary file 
-location. And, you know, my dog died, and I wanted to make something named 
-after her. Pic coming soon.
+C++ is also gross, but way easier than C, which I do want to eventually convert this to. And, you know, my dog died, and
+
+I wanted to make something named after her. Pic coming soon.
 
 So, this is for you, Sky Blue.
 
