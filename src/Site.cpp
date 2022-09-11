@@ -102,11 +102,11 @@ void Site::generate()
     Logger::log("Added " + std::to_string(m_pages.size()) + " pages");
     for (auto &page: m_pages)
     {
-        m_pages_map[page.get_final_path()] = &page;
+        m_pages_map[page.get_final_path()] = page.get_rendered();
         Logger::log("Added page " + page.get_final_path());
         for (auto &child : page.get_children())
         {
-            m_pages_map[child.get_final_path()] = &child;
+            m_pages_map[child.get_final_path()] = child.get_rendered();
             Logger::log("Added child " + child.get_final_path());
         }
     }

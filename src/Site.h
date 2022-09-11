@@ -13,7 +13,7 @@ class Site
 private:
     std::vector<Page> m_pages;
     std::string m_input_dir;
-    std::unordered_map<std::string, Page *> m_pages_map;
+    std::unordered_map<std::string, std::string> m_pages_map;
     std::unordered_map<std::string, std::string> m_files_map;
     std::unordered_map<std::string, time_t> m_files_time_map;
 public:
@@ -28,7 +28,7 @@ public:
 
     void rerender();
 
-    Page *get_page(const std::string &path)
+    std::string get_page(const std::string &path)
     {
         return m_pages_map[path];
     };

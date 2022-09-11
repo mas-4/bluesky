@@ -78,7 +78,7 @@ std::string Server::construct_response(const std::string &request)
     if (m_site.has_page(path))
     {
         auto page = m_site.get_page(path);
-        response_content = page->get_rendered();
+        response_content = page;
     }
     else if (m_site.has_file(path))
     {
@@ -121,4 +121,5 @@ void Server::run()
 
 Server::~Server()
 {
+    close(m_server_fd);
 }
