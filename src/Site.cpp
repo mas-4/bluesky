@@ -6,6 +6,7 @@
 #include "Meta.h"
 #include "Config.h"
 #include "Logger.h"
+#include "utils.h"
 #include <filesystem>
 #include <fstream>
 
@@ -65,8 +66,18 @@ Site::Site(std::string input_dir)
     }
     meta = new Meta(meta_path);
     // recursively walk the input directory and build a list of pages
+    generate();
+}
+
+void Site::generate()
+{
+
+    m_pages.clear();
+    m_pages_map.clear();
+    m_files_map.clear();
     for (auto &entry: std::filesystem::recursive_directory_iterator(m_input_dir))
     {
+        if (!entry.is_directory()) m_files_time_map[entry.path()] = utils::get_last_modified(entry.path());
         if (!entry.is_directory() && is_valid_page(entry.path().string()))
         {
             Logger::log("Adding page " + entry.path().string());
@@ -126,4 +137,17 @@ bool Site::has_page(const std::string &path) const
 bool Site::has_file(const std::string &path) const
 {
     return m_files_map.find(path) != m_files_map.end();
+}
+
+void Site::rerender()
+{
+    for (auto &pair: m_files_time_map)
+    {
+        if (utils::get_last_modified(pair.first) > pair.second)
+        {
+            Logger::log("File " + pair.first + " has been modified");
+            generate();
+            return;
+        }
+    }
 }

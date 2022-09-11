@@ -15,6 +15,7 @@ private:
     std::string m_input_dir;
     std::unordered_map<std::string, Page *> m_pages_map;
     std::unordered_map<std::string, std::string> m_files_map;
+    std::unordered_map<std::string, time_t> m_files_time_map;
 public:
     explicit Site(std::string input_dir);
 
@@ -25,6 +26,8 @@ public:
     [[nodiscard]] bool has_page(const std::string &path) const;
     [[nodiscard]] bool has_file(const std::string &path) const;
 
+    void rerender();
+
     Page *get_page(const std::string &path)
     {
         return m_pages_map[path];
@@ -34,6 +37,8 @@ public:
     {
         return m_files_map[path];
     };
+
+    void generate();
 };
 
 
