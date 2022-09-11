@@ -181,6 +181,9 @@ std::unordered_map<std::string, std::string> Markdown::parse_frontmatter(const s
         // trim value
         value.erase(0, value.find_first_not_of(' '));
         value.erase(value.find_last_not_of(' ') + 1);
+        // remove quotes
+        value.erase(0, value.find_first_not_of('"'));
+        value.erase(value.find_last_not_of('"') + 1);
         frontmatter[key] = value;
     }
     return frontmatter;
