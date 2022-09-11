@@ -59,10 +59,16 @@ std::string get_mime_type(const std::string &path)
     return Constants::MIME_TYPES.at(extension);
 }
 
+std::string parse_path(const std::string &request) {
+    std::string path = request.substr(request.find(' ') + 1);
+    path = path.substr(0, path.find(' '));
+    return path;
+}
+
 std::string Server::construct_response(const std::string &request)
 {
-    size_t after_get = request.find("GET ") + 4;
-    std::string path = request.substr(after_get, request.find(' ', after_get) - after_get);
+    Logger::log("Parsing path");
+    std::string path = parse_path(request);
     Logger::log("Request: " + path);
     if (path == "/")    // root is index.html
     {
@@ -74,6 +80,7 @@ std::string Server::construct_response(const std::string &request)
     }
     std::string response_content;
 
+    Logger::log("Rerendering...");
     m_site.rerender();
     if (m_site.has_page(path))
     {
