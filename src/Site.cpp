@@ -75,6 +75,7 @@ void Site::generate()
     m_pages.clear();
     m_pages_map.clear();
     m_files_map.clear();
+    m_files_time_map.clear();
     for (auto &entry: std::filesystem::recursive_directory_iterator(m_input_dir))
     {
         if (!entry.is_directory())
@@ -145,17 +146,22 @@ void Site::rerender()
     for (auto &entry: std::filesystem::recursive_directory_iterator(m_input_dir))
     {
         std::string path_s = entry.path().string();
-        if (!entry.is_directory() && (is_valid_page(path_s) || is_copyable(path_s)))
+        bool requires_regen = !m_files_time_map.contains(entry.path()) ||
+                              m_files_time_map[entry.path()] < utils::get_last_modified(entry.path());
+        if (!entry.is_directory() && requires_regen)
         {
-            if (
-                    !m_files_time_map.contains(entry.path())
-                    || m_files_time_map[entry.path()] < utils::get_last_modified(entry.path())
-                    )
-            {
-                Logger::info("Re-rendering " + path_s);
-                generate();
-                return;
-            }
+            Logger::info("Re-rendering due to " + path_s);
+            generate();
+            return;
+        }
+    }
+    for (auto &pair: m_files_time_map)
+    {
+        if (!std::filesystem::exists(pair.first))
+        {
+            Logger::info("Re-rendering due to " + pair.first);
+            generate();
+            return;
         }
     }
 }
