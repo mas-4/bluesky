@@ -39,7 +39,7 @@ Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
     m_output_path = config->get_output_dir() + filepath;
     m_final_path = filepath;
 
-    Logger::log("Rendering templated page: " + m_path);
+    Logger::debug("Rendering templated page: " + m_path);
 }
 
 // copy constructor
@@ -109,8 +109,7 @@ void Page::render_markdown_tags()
         }
         else
         {
-            std::cerr << "Warning: Invalid order attribute for markdown tag '" << order << "' in " << m_path
-                      << std::endl;
+            Logger::warn("Invalid order attribute for markdown tag: " + m_path);
         }
         ss << "<ul>\n";
         for (auto &child: m_children)
@@ -139,9 +138,8 @@ void Page::render_templating()
     size_t tmpl_idx = tmp.find(Constants::OPENER);
     if (utils::identify_import(tmp, tmpl_idx) != Constants::IT_TEMPLATE)
     {
-        std::cerr << "Warning: <bluesky-template /> must be the first bluesky tag in a file" << m_path << "."
-                  << std::endl;
-        std::cerr << tmp << std::endl;
+        Logger::warn("File is templated but does not contain a template tag at the start: " + m_path);
+        Logger::warn(tmp);
         return;
     }
     // instantiate template shared_ptr
@@ -187,13 +185,12 @@ void Page::render_variables()
             }
             else
             {
-                std::cerr << "Warning: meta key " << key << " does not exist for page" << m_path << std::endl;
+                Logger::warn("Meta does not contain key: " + key + " in file: " + m_path);
             }
         }
         else
         {
-            std::cerr << "Warning: Unknown namespace in variable " << m_rendered.substr(idx, var_end - idx + 1)
-                      << "in page " << m_path << std::endl;
+            Logger::warn("Invalid namespace: " + ns + " in file: " + m_path);
         }
         idx = last_idx;
     }
@@ -218,26 +215,26 @@ void Page::render()
 
     if (!is_templated()) // the file is not templated, therefore we can directly render it
     {
-        Logger::log("Page is not templated: " + m_path);
+        Logger::debug("Page is not templated: " + m_path);
         m_rendered = Block(m_raw, m_path).get_rendered();
-        Logger::log("Rendering variables: " + m_path);
+        Logger::debug("Rendering variables: " + m_path);
         render_variables();
     }
     else if (m_path.ends_with(".md"))
     {
-        Logger::log("Page is markdown: " + m_path);
+        Logger::debug("Page is markdown: " + m_path);
         std::unordered_map<std::string, std::string> blocks;
         blocks[m_slot] = Markdown::parse(m_raw);
         m_rendered = m_template->render(blocks, m_frontmatter);
     }
     else
     {
-        Logger::log("Page is templated: " + m_path);
-        Logger::log("Rendering markdown tags...");
+        Logger::debug("Page is templated: " + m_path);
+        Logger::debug("Rendering markdown tags...");
         render_markdown_tags();
-        Logger::log("Rendering templating...");
+        Logger::debug("Rendering templating...");
         render_templating();
-        Logger::log("Rendering variables...");
+        Logger::debug("Rendering variables...");
         render_variables();
     }
 }
@@ -252,7 +249,7 @@ void Page::write()
     // check if the file exists
     if (!file.is_open())
     {
-        std::cerr << "Could not open file " << m_output_path << std::endl;
+        Logger::warn("Could not open file for writing: " + m_output_path);
         return;
     }
     file << m_rendered;
@@ -263,7 +260,7 @@ void Page::write()
     }
     if (!m_children.empty())
     {
-        Logger::log("Wrote " + std::to_string(m_children.size()) + " children of " + m_path);
+        Logger::debug("Wrote " + std::to_string(m_children.size()) + " children of " + m_path);
     }
 }
 

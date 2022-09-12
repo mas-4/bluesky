@@ -19,7 +19,7 @@ private:
 
     void render();
 
-    std::string render_variables(
+    static std::string render_variables(
             const std::string &block,
             const std::unordered_map<std::string, std::string> &frontmatter
     );

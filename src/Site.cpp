@@ -62,7 +62,7 @@ Site::Site(std::string input_dir)
     std::string meta_path = m_input_dir + "/meta";
     if (config->is_verbose())
     {
-        std::cout << "Reading meta file from " << meta_path << std::endl;
+        Logger::debug("Opening meta file: " + meta_path);
     }
     meta = new Meta(meta_path);
     // recursively walk the input directory and build a list of pages
@@ -77,17 +77,18 @@ void Site::generate()
     m_files_map.clear();
     for (auto &entry: std::filesystem::recursive_directory_iterator(m_input_dir))
     {
-        if (!entry.is_directory()) m_files_time_map[entry.path()] = utils::get_last_modified(entry.path());
+        if (!entry.is_directory())
+        { m_files_time_map[entry.path()] = utils::get_last_modified(entry.path()); }
         if (!entry.is_directory() && is_valid_page(entry.path().string()))
         {
-            Logger::log("Adding page " + entry.path().string());
+            Logger::debug("Adding page " + entry.path().string());
             auto p = Page(entry.path().string());
             p.render();
             m_pages.emplace_back(p);
         }
         else if (!entry.is_directory() && is_copyable(entry.path().string()))
         {
-            Logger::log("Copying " + entry.path().string());
+            Logger::debug("Copying " + entry.path().string());
             std::string final_path = entry.path().string().substr(m_input_dir.size());
             std::string output_path = config->get_output_dir() + final_path;
             std::filesystem::create_directories(std::filesystem::path(output_path).parent_path());
@@ -99,15 +100,15 @@ void Site::generate()
             m_files_map[final_path] = utils::read_file(entry.path().string());
         }
     }
-    Logger::log("Added " + std::to_string(m_pages.size()) + " pages");
+    Logger::debug("Added " + std::to_string(m_pages.size()) + " pages");
     for (auto &page: m_pages)
     {
         m_pages_map[page.get_final_path()] = page.get_rendered();
-        Logger::log("Added page " + page.get_final_path());
-        for (auto &child : page.get_children())
+        Logger::debug("Added page " + page.get_final_path());
+        for (auto &child: page.get_children())
         {
             m_pages_map[child.get_final_path()] = child.get_rendered();
-            Logger::log("Added child " + child.get_final_path());
+            Logger::debug("Added child " + child.get_final_path());
         }
     }
 }
@@ -116,13 +117,13 @@ void Site::write()
 {
     for (auto &page: m_pages)
     {
-        Logger::log("Writing page " + page.get_path());
+        Logger::debug("Writing page " + page.get_path());
         page.write();
     }
 
-    Logger::log("Wrote " + std::to_string(m_pages.size()) + " top level pages");
-    Logger::log("Writing .htaccess");
-    std::cout << "Writing .htaccess" << std::endl;
+    Logger::debug("Wrote " + std::to_string(m_pages.size()) + " top level pages");
+    Logger::debug("Writing .htaccess");
+    Logger::debug("Writing " + config->get_output_dir() + "/.htaccess");
     // write out htaccess file
     std::ofstream file(config->get_output_dir() + "/.htaccess");
     file << htaccess;
@@ -141,13 +142,20 @@ bool Site::has_file(const std::string &path) const
 
 void Site::rerender()
 {
-    for (auto &pair: m_files_time_map)
+    for (auto &entry: std::filesystem::recursive_directory_iterator(m_input_dir))
     {
-        if (utils::get_last_modified(pair.first) > pair.second)
+        std::string path_s = entry.path().string();
+        if (!entry.is_directory() && (is_valid_page(path_s) || is_copyable(path_s)))
         {
-            Logger::log("File " + pair.first + " has been modified");
-            generate();
-            return;
+            if (
+                    !m_files_time_map.contains(entry.path())
+                    || m_files_time_map[entry.path()] < utils::get_last_modified(entry.path())
+                    )
+            {
+                Logger::info("Re-rendering " + path_s);
+                generate();
+                return;
+            }
         }
     }
 }

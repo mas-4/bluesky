@@ -2,14 +2,13 @@
 // Created by Michael Sendker on 8/28/22.
 //
 
+#include "Block.h"
+#include "Meta.h"
+#include "Logger.h"
 #include "Template.h"
 #include "utils.h"
-#include "Block.h"
 #include <sstream>
 #include <iostream>
-#include "Meta.h"
-
-#
 
 extern Meta *meta;
 
@@ -37,7 +36,7 @@ Template::render_variables(const std::string &block, const std::unordered_map<st
             }
             else
             {
-                std::cerr << "Warning: meta key " << key << " does not exist." << std::endl;
+                Logger::warn("Meta key " + key + " not found.");
             }
         }
         else if (ns == "frontmatter")
@@ -49,13 +48,12 @@ Template::render_variables(const std::string &block, const std::unordered_map<st
             }
             else
             {
-                std::cerr << "Warning: frontmatter key " << key << " does not exist." << std::endl;
+                Logger::warn("Frontmatter key " + key + " not found.");
             }
         }
         else
         {
-            std::cerr << "Warning: Unknown namespace in variable " << block.substr(idx, var_end - idx + 1)
-                      << std::endl;
+            Logger::warn("Unknown namespace " + ns + ".");
         }
         idx = last_idx;
     }

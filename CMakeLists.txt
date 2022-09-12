@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.7...3.24)
 project(bluesky)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set(MD4C tpc/md4c)
 

@@ -4,6 +4,7 @@
 
 #include "Block.h"
 #include "Constants.h"
+#include "Logger.h"
 #include "utils.h"
 
 #include <sstream>
@@ -51,7 +52,7 @@ void Block::render()
             {
                 size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
                 std::string tag = m_raw.substr(idx, m_raw.find(Constants::CLOSER, idx) - idx + 1);
-                std::cerr << "Unknown import type: " << tag << std::endl;
+                Logger::warn("Unknown tag " + tag + ".");
                 last_idx = tag_end;
                 break;
             }

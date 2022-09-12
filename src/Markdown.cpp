@@ -3,6 +3,7 @@
 //
 
 #include "Markdown.h"
+#include "Logger.h"
 #include <iostream>
 #include <sstream>
 #include <cstring>
@@ -142,8 +143,10 @@ std::string Markdown::parse(const std::string &raw)
 
     if (ret != 0)
     {
-        std::cerr << "Parsing failed.\n" << std::endl;
-        exit(1);
+        Logger::warn("Parsing failed.");
+        membuf_fini(&buf_in);
+        membuf_fini(&buf_out);
+        return "";
     }
 
     // convert buf_out.data to a std::string
@@ -153,12 +156,11 @@ std::string Markdown::parse(const std::string &raw)
     // strip question mark paragraph
     // no idea why it's there
     std::string bad_chars = "�";
-    size_t bad_output;
+    size_t bad_output = 0;
     while ((bad_output = output.find(bad_chars)) != std::string::npos) {
         output.replace(bad_output, bad_chars.size(), "");
     }
     bad_chars = "<p></p>";
-    bad_output;
     while ((bad_output = output.find(bad_chars)) != std::string::npos) {
         output.replace(bad_output, bad_chars.size(), "");
     }

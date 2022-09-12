@@ -67,9 +67,9 @@ std::string parse_path(const std::string &request) {
 
 std::string Server::construct_response(const std::string &request)
 {
-    Logger::log("Parsing path");
+    Logger::debug("Parsing path");
     std::string path = parse_path(request);
-    Logger::log("Request: " + path);
+    Logger::info("Request: " + path);
     if (path == "/")    // root is index.html
     {
         path = "/index.html";
@@ -80,7 +80,6 @@ std::string Server::construct_response(const std::string &request)
     }
     std::string response_content;
 
-    Logger::log("Rerendering...");
     m_site.rerender();
     if (m_site.has_page(path))
     {
