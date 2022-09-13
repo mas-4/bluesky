@@ -19,14 +19,14 @@ extern Config *config;
 extern Meta *meta;
 
 Page::Page(std::string path)
-        : m_path(std::move(path)), m_lastmodified(0)
+        : m_path(std::move(path))
 {
     m_output_path = config->get_output_dir() + m_path.substr(config->get_input_dir().size());
     m_final_path = m_output_path.substr(config->get_output_dir().size());
 }
 
 Page::Page(std::string path, std::shared_ptr<Template> templ, std::string slot)
-        : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot)), m_lastmodified(0)
+        : m_path(std::move(path)), m_template(std::move(templ)), m_slot(std::move(slot))
 {
     std::string filepath = m_path.substr(config->get_input_dir().size());
     // replace .md with .html if it's a markdown file
@@ -54,7 +54,6 @@ Page::Page(const Page &page)
     m_slot = page.m_slot;
     m_children = page.m_children;
     m_frontmatter = page.m_frontmatter;
-    m_lastmodified = page.m_lastmodified;
 }
 
 // Destructor
@@ -202,7 +201,6 @@ void Page::render_variables()
 void Page::render()
 {
     m_raw = utils::read_file(m_path);
-    m_lastmodified = utils::get_last_modified(m_path);
     if (m_path.ends_with(".md"))
     {
         for (auto &pair: Markdown::parse_frontmatter(m_raw))

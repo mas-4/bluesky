@@ -21,8 +21,8 @@ namespace Constants
         IT_SLOT,
         IT_BLOCK,
         IT_BLOCK_END,
+        IT_MD_INCLUDE,
         IT_UNKNOWN,
-        IT_MD_INCLUDE
     };
     static const unsigned MD_FLAGS = MD_FLAG_COLLAPSEWHITESPACE | MD_FLAG_TABLES | MD_FLAG_TASKLISTS |
                                      MD_FLAG_STRIKETHROUGH | MD_FLAG_PERMISSIVEAUTOLINKS |

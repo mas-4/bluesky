@@ -29,7 +29,6 @@ private:
     std::string m_raw;
     std::string m_slot;
     std::string m_rendered;
-    time_t m_lastmodified;
 
     std::vector<Page> m_children;
     std::shared_ptr<Template> m_template;
@@ -69,9 +68,6 @@ public:
 
     std::string get_rendered() const
     { return m_rendered; };
-
-    time_t get_last_modified() const
-    { return m_lastmodified; };
 
 };
 
