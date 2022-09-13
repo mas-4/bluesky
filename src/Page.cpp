@@ -143,7 +143,7 @@ void Page::render_templating()
         return;
     }
     // instantiate template shared_ptr
-    std::string templ_path_raw = utils::get_attribute(tmp.substr(tmpl_idx), "template");
+    std::string templ_path_raw = utils::get_attribute(tmp.substr(tmpl_idx), "path");
     std::string templ_path = utils::get_relative_path(m_path) + "/" + templ_path_raw;
     Template template_obj(templ_path);
     std::shared_ptr<Template> template_ptr = std::make_shared<Template>(template_obj);

@@ -43,9 +43,9 @@ void Block::render()
             }
             case Constants::IT_MD_INCLUDE:
             {
-                std::string name = utils::get_attribute(m_raw.substr(idx), "name");
+                std::string rel_path = utils::get_attribute(m_raw.substr(idx), "path");
                 size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
-                std::string path = utils::get_relative_path(m_path) + "/" + name;
+                std::string path = utils::get_relative_path(m_path) + "/" + rel_path;
                 auto content = utils::read_file(path);
                 ss << Markdown::parse(content);
                 last_idx = tag_end;
