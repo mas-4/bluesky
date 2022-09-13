@@ -29,8 +29,14 @@ Config::Config(int argc, char *const argv[])
                 m_verbose = true;
                 break;
             case 'h':
+            {
                 m_serve_ip = std::string(optarg);
+                if (m_serve_ip.empty())
+                {
+                    m_serve_ip = "127.0.0.1:8080";
+                }
                 break;
+            }
             default:
                 break;
         }
@@ -53,7 +59,7 @@ Config::Config(int argc, char *const argv[])
     }
     if (m_output_dir.empty())
     {
-        m_output_dir = "./_build";
+        m_output_dir = "./build";
     }
 }
 

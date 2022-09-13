@@ -93,11 +93,15 @@ void Site::generate()
             Logger::debug("Copying " + entry.path().string());
             std::string final_path = entry.path().string().substr(m_input_dir.size());
             std::string output_path = config->get_output_dir() + final_path;
-            std::filesystem::create_directories(std::filesystem::path(output_path).parent_path());
-            // overwrite existing files
-            std::filesystem::copy_file(entry.path().string(),
-                                       output_path,
-                                       std::filesystem::copy_options::overwrite_existing);
+            if (config->get_serve_ip().empty())
+            {
+
+                std::filesystem::create_directories(std::filesystem::path(output_path).parent_path());
+                // overwrite existing files
+                std::filesystem::copy_file(entry.path().string(),
+                                           output_path,
+                                           std::filesystem::copy_options::overwrite_existing);
+            }
             // read the file into m_file_map
             m_files_map[final_path] = utils::read_file(entry.path().string());
         }
@@ -127,9 +131,9 @@ void Site::write()
     Logger::debug("Writing .htaccess");
     Logger::debug("Writing " + config->get_output_dir() + "/.htaccess");
     // write out htaccess file
-    std::ofstream file(config->get_output_dir() + "/.htaccess");
-    file << htaccess;
-    file.close();
+    std::ofstream htaccess_file(config->get_output_dir() + "/.htaccess");
+    htaccess_file << htaccess;
+    htaccess_file.close();
 }
 
 bool Site::has_page(const std::string &path) const
