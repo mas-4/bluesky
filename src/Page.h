@@ -5,18 +5,17 @@
 #ifndef BLUESKY_PAGE_H
 #define BLUESKY_PAGE_H
 
-#include <vector>
-#include <string>
-#include <memory>
 #include <iostream>
+#include <string>
 #include <sys/stat.h>
+#include <vector>
 
-#include "Constants.h"
-#include "Page.h"
 #include "Block.h"
+#include "Constants.h"
+#include "Logger.h"
+#include "Page.h"
 #include "Template.h"
 #include "utils.h"
-#include "Logger.h"
 
 
 class Page
@@ -55,9 +54,6 @@ public:
     void render();
 
     void write();
-
-    std::string get_out_path()
-    { return m_output_path; };
 
     std::string get_path()
     { return m_path; };

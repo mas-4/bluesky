@@ -2,13 +2,14 @@
 // Created by mas on 7/10/22.
 //
 
-#include "utils.h"
+#include "Config.h"
 #include "Logger.h"
+#include "utils.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "sys/stat.h"
-#include "Config.h"
+#include <sys/stat.h>
 
 extern Config *config;
 

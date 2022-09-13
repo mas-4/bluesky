@@ -8,8 +8,8 @@
 #include "Markdown.h"
 #include "utils.h"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <utility>
 
 Block::Block(std::string raw, std::string path)

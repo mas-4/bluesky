@@ -5,8 +5,9 @@
 #ifndef BLUESKY_SITE_H
 #define BLUESKY_SITE_H
 
-#include <vector>
 #include "Page.h"
+
+#include <vector>
 
 class Site
 {

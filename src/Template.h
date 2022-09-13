@@ -5,8 +5,8 @@
 #ifndef BLUESKY_TEMPLATE_H
 #define BLUESKY_TEMPLATE_H
 
-#include <vector>
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 

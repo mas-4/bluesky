@@ -2,18 +2,18 @@
 // Created by mas on 7/4/22.
 //
 
-#include <fstream>
+#include "Block.h"
+#include "Config.h"
+#include "Markdown.h"
+#include "Meta.h"
+#include "Page.h"
+
 #include <algorithm>
 #include <filesystem>
+#include <fstream>
+#include <sstream>
 #include <unordered_map>
 #include <utility>
-#include <sstream>
-
-#include "Page.h"
-#include "Config.h"
-#include "Block.h"
-#include "Meta.h"
-#include "Markdown.h"
 
 extern Config *config;
 extern Meta *meta;

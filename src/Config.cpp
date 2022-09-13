@@ -4,8 +4,9 @@
 
 #include "Config.h"
 #include "Logger.h"
-#include <unistd.h>
+
 #include <iostream>
+#include <unistd.h>
 
 // create a null instance of Config to be initialized by main
 Config *config = nullptr;

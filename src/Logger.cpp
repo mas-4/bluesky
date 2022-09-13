@@ -2,8 +2,10 @@
 // Created by mas on 9/5/22.
 //
 
-#include "Logger.h"
 #include "Config.h"
+#include "Logger.h"
+
+#include <iostream>
 
 extern Config *config;
 

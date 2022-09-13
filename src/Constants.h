@@ -5,9 +5,10 @@
 #ifndef BLUESKY_CONSTANTS_H
 #define BLUESKY_CONSTANTS_H
 
+#include "md4c.h"
+
 #include <string>
 #include <unordered_map>
-#include "md4c.h"
 
 namespace Constants
 {
