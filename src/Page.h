@@ -6,6 +6,7 @@
 #define BLUESKY_PAGE_H
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <sys/stat.h>
 #include <vector>
