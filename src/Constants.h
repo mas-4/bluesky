@@ -21,13 +21,14 @@ namespace Constants
         IT_BLOCK,
         IT_BLOCK_END,
         IT_UNKNOWN,
-        IT_CODE
+        IT_CODE,
+        IT_MD_INCLUDE
     };
     static const unsigned MD_FLAGS = MD_FLAG_COLLAPSEWHITESPACE | MD_FLAG_TABLES | MD_FLAG_TASKLISTS |
                                      MD_FLAG_STRIKETHROUGH | MD_FLAG_PERMISSIVEAUTOLINKS |
                                      MD_FLAG_PERMISSIVEWWWAUTOLINKS |
                                      MD_FLAG_LATEXMATHSPANS;
-    static const size_t IMPORT_TAG_LENGTH = 7;
+    static const size_t IMPORT_TAG_LENGTH = 8;
     static const std::string OPENER = "<bluesky-";
     static const std::string CLOSER = ">";
     static const std::string VARIABLE_OPENER = "${";
@@ -40,6 +41,7 @@ namespace Constants
             "<bluesky-block",
             "</bluesky-block>",
             "```",
+            "<bluesky-md-include"
     };
     static const std::string TEMPLATE_END = "</bluesky-template>";
     static const size_t DEFAULT_PORT = 8080;

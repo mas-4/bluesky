@@ -5,6 +5,7 @@
 #include "Block.h"
 #include "Constants.h"
 #include "Logger.h"
+#include "Markdown.h"
 #include "utils.h"
 
 #include <sstream>
@@ -45,6 +46,16 @@ void Block::render()
                 auto content = utils::read_file(path);
                 Block include(content, path);
                 ss << include.get_rendered();
+                last_idx = tag_end;
+                break;
+            }
+            case Constants::IT_MD_INCLUDE:
+            {
+                std::string name = utils::get_attribute(m_raw.substr(idx), "name");
+                size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
+                std::string path = utils::get_relative_path(m_path) + "/" + name;
+                auto content = utils::read_file(path);
+                ss << Markdown::parse(content);
                 last_idx = tag_end;
                 break;
             }
