@@ -2,9 +2,10 @@
 // Created by mas on 9/5/22.
 //
 
-#include "Server.h"
 #include "Constants.h"
 #include "Logger.h"
+#include "Server.h"
+
 #include <arpa/inet.h>
 #include <unistd.h>
 

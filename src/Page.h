@@ -5,18 +5,18 @@
 #ifndef BLUESKY_PAGE_H
 #define BLUESKY_PAGE_H
 
-#include <vector>
-#include <string>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <string>
 #include <sys/stat.h>
+#include <vector>
 
-#include "Constants.h"
-#include "Page.h"
 #include "Block.h"
+#include "Constants.h"
+#include "Logger.h"
+#include "Page.h"
 #include "Template.h"
 #include "utils.h"
-#include "Logger.h"
 
 
 class Page
@@ -29,7 +29,6 @@ private:
     std::string m_raw;
     std::string m_slot;
     std::string m_rendered;
-    time_t m_lastmodified;
 
     std::vector<Page> m_children;
     std::shared_ptr<Template> m_template;
@@ -56,9 +55,6 @@ public:
 
     void write();
 
-    std::string get_out_path()
-    { return m_output_path; };
-
     std::string get_path()
     { return m_path; };
 
@@ -72,9 +68,6 @@ public:
 
     std::string get_rendered() const
     { return m_rendered; };
-
-    time_t get_last_modified() const
-    { return m_lastmodified; };
 
 };
 

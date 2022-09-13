@@ -5,9 +5,10 @@
 #ifndef BLUESKY_CONSTANTS_H
 #define BLUESKY_CONSTANTS_H
 
+#include "md4c.h"
+
 #include <string>
 #include <unordered_map>
-#include "md4c.h"
 
 namespace Constants
 {
@@ -20,8 +21,8 @@ namespace Constants
         IT_SLOT,
         IT_BLOCK,
         IT_BLOCK_END,
+        IT_MD_INCLUDE,
         IT_UNKNOWN,
-        IT_CODE
     };
     static const unsigned MD_FLAGS = MD_FLAG_COLLAPSEWHITESPACE | MD_FLAG_TABLES | MD_FLAG_TASKLISTS |
                                      MD_FLAG_STRIKETHROUGH | MD_FLAG_PERMISSIVEAUTOLINKS |
@@ -39,7 +40,7 @@ namespace Constants
             "<bluesky-slot",
             "<bluesky-block",
             "</bluesky-block>",
-            "```",
+            "<bluesky-md-include"
     };
     static const std::string TEMPLATE_END = "</bluesky-template>";
     static const size_t DEFAULT_PORT = 8080;

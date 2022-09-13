@@ -4,7 +4,7 @@
 
 #ifndef BLUESKY_LOGGER_H
 #define BLUESKY_LOGGER_H
-#include <iostream>
+
 #include <string>
 
 class Logger{

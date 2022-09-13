@@ -5,11 +5,12 @@
 #ifndef BLUESKY_SERVER_H
 #define BLUESKY_SERVER_H
 
-#include <unordered_map>
-#include <string>
+#include "Site.h"
+
 #include <netinet/in.h>
 #include <sys/socket.h>
-#include "Site.h"
+#include <string>
+#include <unordered_map>
 
 
 class Server

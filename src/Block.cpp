@@ -5,10 +5,11 @@
 #include "Block.h"
 #include "Constants.h"
 #include "Logger.h"
+#include "Markdown.h"
 #include "utils.h"
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 #include <utility>
 
 Block::Block(std::string raw, std::string path)
@@ -23,18 +24,10 @@ void Block::render()
     Constants::ImportType it;
     std::stringstream ss;
     size_t last_idx = 0;
-    bool code_fence = false;
     while ((idx = m_raw.find(Constants::OPENER, idx)) != std::string::npos)
     {
         it = utils::identify_import(m_raw, idx);
         ss << m_raw.substr(last_idx, idx - last_idx);
-        if (code_fence && it == Constants::IT_CODE)
-        {
-            last_idx = idx;
-            idx += 1;
-            code_fence = false;
-            continue;
-        }
         switch (it)
         {
             case Constants::IT_INCLUDE:
@@ -48,6 +41,16 @@ void Block::render()
                 last_idx = tag_end;
                 break;
             }
+            case Constants::IT_MD_INCLUDE:
+            {
+                std::string rel_path = utils::get_attribute(m_raw.substr(idx), "path");
+                size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
+                std::string path = utils::get_relative_path(m_path) + "/" + rel_path;
+                auto content = utils::read_file(path);
+                ss << Markdown::parse(content);
+                last_idx = tag_end;
+                break;
+            }
             case Constants::IT_UNKNOWN:
             {
                 size_t tag_end = m_raw.find(Constants::CLOSER, idx) + 1;
@@ -55,10 +58,6 @@ void Block::render()
                 Logger::warn("Unknown tag " + tag + ".");
                 last_idx = tag_end;
                 break;
-            }
-            case Constants::IT_CODE:
-            {
-                code_fence = true;
             }
             default:
             {

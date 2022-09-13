@@ -2,11 +2,12 @@
 // Created by Michael Sendker on 9/1/22.
 //
 
-#include "Markdown.h"
 #include "Logger.h"
+#include "Markdown.h"
+
+#include <cstring>
 #include <iostream>
 #include <sstream>
-#include <cstring>
 
 /*
  * MD4C: Markdown parser for C

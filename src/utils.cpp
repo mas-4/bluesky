@@ -2,13 +2,14 @@
 // Created by mas on 7/10/22.
 //
 
-#include "utils.h"
+#include "Config.h"
 #include "Logger.h"
+#include "utils.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "sys/stat.h"
-#include "Config.h"
+#include <sys/stat.h>
 
 extern Config *config;
 
@@ -42,7 +43,7 @@ std::string utils::get_attribute(const std::string &line, const std::string &att
     size_t start = line.find(attribute);
     if (start == std::string::npos)
     {
-        Logger::warn("Warning: failed to find attribute " + attribute + " in " + line);
+        Logger::warn("failed to find attribute " + attribute + " in " + line);
         return "";
     }
     start += attribute.length();
@@ -56,7 +57,7 @@ std::string utils::read_file(const std::string &path)
     std::ifstream file(path);
     if (!file.is_open())
     {
-        Logger::warn("Error: failed to open file " + path);
+        Logger::error("failed to open file " + path);
         return "";
     }
     std::stringstream buffer;

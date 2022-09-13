@@ -6,7 +6,6 @@
 #define BLUESKY_BLOCK_H
 
 #include <string>
-#include "utils.h"
 
 
 class Block
@@ -23,9 +22,6 @@ public:
     Block(std::string raw, std::string path);
 
     ~Block() = default;
-
-    std::string get_raw()
-    { return m_raw; };
 
     std::string get_rendered()
     { return m_rendered; };
