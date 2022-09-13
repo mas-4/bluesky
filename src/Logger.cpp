@@ -28,7 +28,7 @@ void Logger::warn(const std::string &msg)
 void Logger::error(const std::string &msg)
 {
     // make console red
-    fprintf(stderr, "\033[1;31mERROR: %s: %m\n", msg.c_str());
+    fprintf(stderr, "\033[1;31mERROR: %s: %m\n\033[0m", msg.c_str());
 }
 
 void Logger::info(const std::string &msg)
