@@ -30,15 +30,18 @@ To build a site:
 bluesky -i ./src -o ./build
 ```
 
-To use the development server, you still need the output directory, even if we never write to it (a limitation I 
-will overcome soon):
+To use the development server:
 
 ```
-bluesky -i ./src -o ./build -h 0.0.0.0
+bluesky -i ./src -h 0.0.0.0
 ```
 
 
-The host can be any ip with a colon port. The default port is 8080 if no port is provided.
+The host can be any ip with a colon port. The default port is `8080` if no port is provided. You can't call `-h` without an argument (a limitation of non-gnu getopt implementations) but if you want to use the default ip/port, `127.0.0.1:8080`:
+
+```
+bluesky -i ./src -h ""
+```
 
 `-v` is verbose mode, which I find useful.
 
