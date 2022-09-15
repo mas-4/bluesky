@@ -47,12 +47,25 @@ bluesky -i ./src -h ""
 
 # Syntax
 
+## Include
+
 ```html
 <bluesky-include name="_nav.html" />
 ```
 
 Will automatically include `src/_imports/_nav.html` wholesale, and also parse it (i.e., `_nav.html` can include 
 other includes). The underscore is unnecessary.
+
+## Markdown Include
+There are also markdown includes:
+
+```html
+<bluesky-md-include path="hello.md" />
+```
+
+will render `hello.md` as html and drop it in that spot same as a regular include.
+
+## Templates
 
 ```html
 <bluesky-template name="_imports/template.html" />
@@ -79,6 +92,8 @@ into
 </body>
 ```
 
+## Markdown
+
 Given a file like this:
 
 ```html
@@ -99,6 +114,8 @@ The file in question will render with an unordered list of links, using the `tit
 the anchor text, the template as the template for the rendered markdown (assuming markdown files in the `directory`),
 the `date` variable from the frontmatter as the sort key, in order `descending`, and sticking the rendered markdown 
 in the slot `content` in the markdown template `_imports/post.html`.
+
+## Variables
 
 Finally, you can use variables from a `meta` file in the root of `src` anywhere:
 
