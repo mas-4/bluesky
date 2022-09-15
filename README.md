@@ -18,9 +18,7 @@ which is a nice little project written as a single file of JavaScript.
 
 That's cool and all, and I use it, but its JavaScript (🤮😜).
 
-C++ is also gross, but way easier than C, which I do want to eventually convert this to. And, you know, my dog died, and
-
-I wanted to make something named after her. Pic coming soon.
+C++ is also gross, but way easier than C, which I do want to eventually convert this to. And, you know, my dog died, and I wanted to make something named after her. Pic coming soon.
 
 So, this is for you, Sky Blue.
 
